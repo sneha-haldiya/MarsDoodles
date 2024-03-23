@@ -24,7 +24,7 @@ const LandingPage = () => {
                 
                 <input type='text' placeholder='Enter GamerTag' className='p-2 pt-1 pb-1 outline-0 rounded-md' id='Name' onChange={e=>setPlayerName(e.target.value)} required/>
                 <br />
-                <input type='text' placeholder='Enter Room Name' className='p-2 pt-1 pb-1 outline-0 rounded-md' id='Room' onChange={e=>setRoomName(e.target.value)}  required/>
+                <input type='number' placeholder='Enter Room Name' className='p-2 pt-1 pb-1 outline-0 rounded-md' id='Room' onChange={e=>setRoomName(e.target.value)}  required/>
                 <br />
                 <button type='submit' id='enterButton' className='p-2 pt-1 pb-1 outline-0 rounded-md bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 text-white' onClick={onJoinGame}>
                     Join Room

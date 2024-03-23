@@ -8,16 +8,18 @@ import { SocketContext, socket } from './context/socket'
 const App = () => {
   const [loginVisible, setLoginVisible] = useState(true)
   const [roomnumber, setRoomNumber] = useState(0);
+  const [userName, setUserName] = useState("");
   useEffect(() => {
-    socket.on("join_successfull", (roomname) => {
-      setRoomNumber(roomname);
-      console.log("(client)join successful in=" + roomname)
+    socket.on("join_successfull", ({ roomName, playerName }) => {
+      setRoomNumber(roomName);
+      setUserName(playerName);
+      console.log("(client)join successful in=" + roomName)
       setLoginVisible(false);
     })
     socket.on("join_unsuccessful", (message) => {
       alert(message);
     })
-  }, [socket])
+  }, [socket, roomnumber, userName])
 
 
 
@@ -28,8 +30,8 @@ const App = () => {
           <JoinPage />
           <CreateRoomPage />
         </div>}
-        {!loginVisible && <div style={{ height: '100vh', width: '100vw', backgroundColor: 'red' }} className='flex justify-center items-center'>
-          <GamePage rm={roomnumber} />
+        {!loginVisible && <div style={{ height: '100vh', width: '100vw', backgroundColor: 'beige' }}>
+          <GamePage roomNumber={roomnumber} userName={userName} />
         </div>}
       </div>
     </SocketContext.Provider>

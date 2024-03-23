@@ -22,55 +22,48 @@ class Room {
         this.Players.push(player)
         console.log(this.Players);
     }
-    getPlayers()
-    {
+    getPlayers() {
         return this.Players;
     }
-    getHost()
-    {
+    getHost() {
         return this.host;
     }
-    getRoomName()
-    {
+    getRoomName() {
         return this.roomname;
     }
-    getPlayerCount()
-    {
+    getPlayerCount() {
         return this.playerCount;
     }
-    getTimer()
-    {
+    getTimer() {
         return this.timer;
     }
 }
 
-class Player
-{
-    constructor(playerName, isHost, isLead, roomName){
+class Player {
+    constructor(playerName, isHost, isLead, roomName, socketId) {
         this.playerName = playerName
+        this.socketId = socketId
         this.isHost = isHost
         this.isLead = isLead
         this.roomName = roomName
         this.points = 0
     }
-    getPlayerName()
-    {
+    getPlayerName() {
         return this.playerName;
     }
-    getPoints()
-    {
+    getPlayerSocketId() {
+        return this.socketId;
+    }
+    getPoints() {
         return this.points;
     }
-    getIsHost()
-    {
+    getIsHost() {
         return this.isHost;
     }
-    getIsLead()
-    {
+    getIsLead() {
         return this.isLead;
     }
-    getRoomName()
-    {
+    getRoomName() {
         return this.roomName;
     }
 }
@@ -83,32 +76,28 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-    
-    socket.on("join_room", ({playerName, roomName}) => {
+
+    socket.on("join_room", ({ playerName, roomName }) => {
         console.log(Rooms)
         console.log(roomName)
         let roomFound = false;
         let playerFound = false;
         let roomIndex = -1;
-        for(let i = 0; i < Rooms.length; i++)
-        {
-            if(parseInt(Rooms[i].getRoomName()) == parseInt(roomName))
-            {
+        for (let i = 0; i < Rooms.length; i++) {
+            if (parseInt(Rooms[i].getRoomName()) == parseInt(roomName)) {
                 roomIndex = i;
                 roomFound = true;
                 console.log(Rooms[i].getPlayers())
                 Rooms[i].getPlayers().forEach((player) => {
-                    if(player.getPlayerName().toString() === playerName.toString())
-                    playerFound = true;
+                    if (player.getPlayerName().toString() === playerName.toString())
+                        playerFound = true;
                 })
             }
         }
-        if(!roomFound)
-        {
+        if (!roomFound) {
             socket.emit("join_unsuccessful", ("Room does not exist!"));
         }
-        else if(playerFound)
-        {
+        else if (playerFound) {
             socket.emit("join_unsuccessful", ("A player of same name exits in the room!"));
         }
         /* if (Rooms.map(room => room.getRoomName()).indexOf(roomName.toString()) == -1) {
@@ -119,26 +108,36 @@ io.on("connection", (socket) => {
             socket.emit("join_unsuccessful", ("A player of same name exits in the room!"));
         } */
         else {
-            const player = new Player(playerName, false, false, roomName)
+            const player = new Player(playerName, false, false, roomName, socket.id);
             Rooms[roomIndex].addPlayer(player);
             socket.join(roomName);
-            socket.emit("join_successfull", (roomName));
+            socket.emit("join_successfull", ({ roomName, playerName }));
         }
     })
 
-    socket.on("create_room", ({playerName, playerCount, playTime}) => {
-        //console.log({playerName, playerCount, playTime} + " create room init(server)")
-        let number;
-        while(number == undefined || Rooms.map(room => room.roomname).indexOf(number) != -1)
-        {
-            number = Math.floor(Math.random() * 100000);
+    socket.on("create_room", ({ playerName, playerCount, playTime }) => {
+        console.log({ playerName, playerCount, playTime } + " create room init(server)")
+        let roomName;
+        while (roomName == undefined || Rooms.map(room => room.roomname).indexOf(roomName) != -1) {
+            roomName = Math.floor(Math.random() * 100000);
         }
-        const p = new Player(playerName, true, true, number);
-        Rooms.push(new Room(p, number, playerCount, playTime));
-        socket.join(number);
-        //console.log("join successful called (server)" + number);
-        socket.emit("join_successfull", number);
+        roomName = roomName.toString();
+        const p = new Player(playerName, true, true, roomName, socket.id);
+        Rooms.push(new Room(p, roomName, playerCount, playTime));
+        socket.join(roomName);
+        console.log("join successful called (server)" + roomName);
+        socket.emit("join_successfull", ({ roomName, playerName }));
     })
+
+    socket.on("send_message", (data) => {
+        const p = Rooms[Rooms.map(Room => Room.getRoomName()).indexOf(data.room)].getPlayers();
+        p.forEach((player) => {
+            if (player.getPlayerName() !== data.author) {
+                io.to(player.getPlayerSocketId()).emit('receive_message', (data));
+            }
+        })
+        // io.to(data.room).emit('receive_message', (data));
+    });
 })
 
 server.listen(3001, () => {

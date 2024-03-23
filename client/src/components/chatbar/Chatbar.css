@@ -1,0 +1,11 @@
+
+.you {
+    background-color: rgb(167, 255, 156);
+    justify-content: flex-start;
+  }
+  
+  .other {
+    justify-content: flex-end;
+    background-color: rgb(134, 136, 255);
+  }
+  
