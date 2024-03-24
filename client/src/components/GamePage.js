@@ -1,22 +1,21 @@
 import React, { useEffect, useState } from 'react'
-import Header from './Header'
-import SubHeader from './SubHeader'
-import Main from './Main'
+import Header from './Header/Header'
+import SubHeader from './SubHeader/SubHeader'
+import Main from './Main/Main'
 
 const GamePage = ({roomNumber ,userName}) => {
-  const [roomNum, setRoomNum] = useState(0)
+/*   const [roomNum, setRoomNum] = useState(0)
   const [name, setname] = useState("");
   useEffect(() => {
     setRoomNum(roomNumber);
     setname(userName);
-  }, [roomNumber,userName])
+  }, [roomNumber,userName]) */
 
   return (
-    <div className='flex flex-col '>
+    <div className='flex flex-col border-8 border-white h-dvh w-dvw'>
       <Header/>
       <SubHeader/>
-      <Main roomNo={roomNum}  nam={name} />
-
+      <Main roomNumber={roomNumber} userName={userName} />
     </div>
 
   )

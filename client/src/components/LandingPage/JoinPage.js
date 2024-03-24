@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { SocketContext } from '../context/socket';
+import { SocketContext } from '../../context/socket';
 
 const LandingPage = () => {
     const socket = useContext(SocketContext);

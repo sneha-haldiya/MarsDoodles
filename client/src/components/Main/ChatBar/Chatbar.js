@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { SocketContext } from '../../context/socket';
-import './Chatbar.css';
+import { SocketContext } from '../../../context/socket';
+import ChatMessages from './ChatMessages';
 
 
-const Chatbar = ({ rn, un }) => {
+const Chatbar = ({ roomNumber, userName }) => {
   const socket = useContext(SocketContext);
   const [message, setMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
@@ -11,8 +11,8 @@ const Chatbar = ({ rn, un }) => {
   const sendMessage = () => {
     if (message !== "") {
       const messageData = {
-        room: rn,
-        author: un,
+        room: roomNumber,
+        author: userName,
         mess: message,
         time:
           new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
@@ -32,31 +32,25 @@ const Chatbar = ({ rn, un }) => {
   }, [socket]);
 
   return (
-    <div className='flex flex-col items-center bg-purple-200 p-5' >
-      <div style={{ height: '65vh' }} className='w-full height-48 overflow-y-scroll'>
-        {messageList.map((messageContent, index) => {
-          return (
-            <div className={un === messageContent.author ? "you" : "other"}>
-              <div key={index}>
-                <div><p>{messageContent.mess}</p></div>
-                <div><p>{messageContent.time}</p> <p>{messageContent.author}</p></div>
-              </div>
-            </div>
-          )
-        })}
+    <div className='flex flex-col bg-purple-200 p-2' >
+      <div className='w-full h-[-webkit-fill-available]'>
+          {messageList.map((messageContent, index) => {
+            return (<ChatMessages key={index} isSelf={userName === messageContent.author} {...messageContent} />)
+          })}
       </div>
       <div>
-        <form id='formId' action='' className="flex flex-row items-stretch " onSubmit={(e) => { e.preventDefault() }}>
+        <form id='formId' action='' className="flex flex-row" onSubmit={(e) => { e.preventDefault() }}>
           <input
             type="text"
             placeholder="your guess.."
             autoComplete="off"
-            className="flex rounded-l-lg p-2 focus:outline-none w-full sm:w-auto"
+            style={{ width: "-webkit-fill-available" }}
+            className="rounded-l-md focus:outline-none sm:w-auto p-1 pl-2 pr-2 text-md"
             onChange={(event) => { setMessage(event.target.value) }}
           />
-          <button type='submit' className="bg-purple-600 text-white rounded-r-lg px-3 flex items-center"
+          <button type='submit' className="bg-purple-600 text-white rounded-r-md justify-self-end"
             onClick={sendMessage}>
-            <span className="ml-1">Send</span>
+            <span className="ml-2 mr-2">Send</span>
           </button>
         </form>
       </div>

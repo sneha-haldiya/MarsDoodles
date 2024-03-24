@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import JoinPage from './components/JoinPage'
-import CreateRoomPage from './components/CreateRoomPage'
+import JoinPage from './components/LandingPage/JoinPage'
+import CreateRoomPage from './components/LandingPage/CreateRoomPage'
 import GamePage from './components/GamePage'
 
 import { SocketContext, socket } from './context/socket'
 
 const App = () => {
   const [loginVisible, setLoginVisible] = useState(true)
-  const [roomnumber, setRoomNumber] = useState(0);
+  const [roomNumber, setRoomNumber] = useState(0);
   const [userName, setUserName] = useState("");
   useEffect(() => {
     socket.on("join_successfull", ({ roomName, playerName }) => {
@@ -19,7 +19,7 @@ const App = () => {
     socket.on("join_unsuccessful", (message) => {
       alert(message);
     })
-  }, [socket, roomnumber, userName])
+  }, [socket, roomNumber, userName])
 
 
 
@@ -30,8 +30,8 @@ const App = () => {
           <JoinPage />
           <CreateRoomPage />
         </div>}
-        {!loginVisible && <div style={{ height: '100vh', width: '100vw', backgroundColor: 'beige' }}>
-          <GamePage roomNumber={roomnumber} userName={userName} />
+        {!loginVisible && <div className=''>
+          <GamePage roomNumber={roomNumber} userName={userName} />
         </div>}
       </div>
     </SocketContext.Provider>
