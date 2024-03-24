@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Header from './Header'
 import SubHeader from './SubHeader'
-import Body from './Body'
+import Main from './Main'
 
 const GamePage = ({roomNumber ,userName}) => {
   const [roomNum, setRoomNum] = useState(0)
@@ -15,7 +15,7 @@ const GamePage = ({roomNumber ,userName}) => {
     <div className='flex flex-col '>
       <Header/>
       <SubHeader/>
-      <Body roomNo={roomNum}  nam={name} />
+      <Main roomNo={roomNum}  nam={name} />
 
     </div>
 
