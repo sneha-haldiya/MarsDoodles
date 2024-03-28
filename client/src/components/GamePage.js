@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, {useState} from 'react'
 import Header from './Header/Header'
 import SubHeader from './SubHeader/SubHeader'
 import Main from './Main/Main'
@@ -10,12 +10,13 @@ const GamePage = ({roomNumber ,userName}) => {
     setRoomNum(roomNumber);
     setname(userName);
   }, [roomNumber,userName]) */
-
+  const [data, setData] = useState({ color: "#ffffff", size: "8" })
+  const [mode, setMode] = useState("draw");
   return (
     <div className='flex flex-col border-8 border-white h-dvh w-dvw'>
       <Header/>
-      <SubHeader/>
-      <Main roomNumber={roomNumber} userName={userName} />
+      <SubHeader data={data} setData={setData} setMode={setMode}/>
+      <Main roomNumber={roomNumber} userName={userName} data={data} mode={mode}/>
     </div>
 
   )

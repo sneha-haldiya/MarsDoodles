@@ -130,6 +130,7 @@ io.on("connection", (socket) => {
     })
 
     socket.on("send_message", (data) => {
+        console.log(data)
         const p = Rooms[Rooms.map(Room => Room.getRoomName()).indexOf(data.room)].getPlayers();
         p.forEach((player) => {
             if (player.getPlayerName() !== data.author) {
@@ -138,6 +139,10 @@ io.on("connection", (socket) => {
         })
         // io.to(data.room).emit('receive_message', (data));
     });
+
+    socket.on("disconnect", (data) => {
+        console.log(data, "has disconnected");
+    })
 })
 
 server.listen(3001, () => {

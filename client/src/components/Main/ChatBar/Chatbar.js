@@ -33,7 +33,7 @@ const Chatbar = ({ roomNumber, userName }) => {
 
   return (
     <div className='flex flex-col bg-purple-200 p-2' >
-      <div className='w-full h-[-webkit-fill-available]'>
+      <div className='h-[-webkit-fill-available]'>
           {messageList.map((messageContent, index) => {
             return (<ChatMessages key={index} isSelf={userName === messageContent.author} {...messageContent} />)
           })}
@@ -44,8 +44,7 @@ const Chatbar = ({ roomNumber, userName }) => {
             type="text"
             placeholder="your guess.."
             autoComplete="off"
-            style={{ width: "-webkit-fill-available" }}
-            className="rounded-l-md focus:outline-none sm:w-auto p-1 pl-2 pr-2 text-md"
+            className="rounded-l-md focus:outline-none w-[-webkit-fill-available] p-1 pl-2 pr-2 xl:text-md lg:text-md md:text-sm"
             onChange={(event) => { setMessage(event.target.value) }}
           />
           <button type='submit' className="bg-purple-600 text-white rounded-r-md justify-self-end"
