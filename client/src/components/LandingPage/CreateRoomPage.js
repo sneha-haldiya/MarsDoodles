@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
-import { SocketContext } from '../../context/socket';
+import { socket } from '../../context/socket';
 const LandingPage = () => {
-    const socket = useContext(SocketContext);
+    // const socket = useContext(SocketContext);
 
     const [playerName, setPlayerName] = useState("");
     const [playerCount, setPlayerCount] = useState(2);

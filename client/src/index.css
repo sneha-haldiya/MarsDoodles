@@ -7,3 +7,26 @@
     height: 100%;
     overflow: hidden;
 }
+/* width */
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::webkit-scr
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #9e9e9e;
+    border-radius: 5px;
+}
+
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover{
+    background: #b0b0b0;
+}

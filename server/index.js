@@ -111,7 +111,9 @@ io.on("connection", (socket) => {
             const player = new Player(playerName, false, false, roomName, socket.id);
             Rooms[roomIndex].addPlayer(player);
             socket.join(roomName);
-            socket.emit("join_successfull", ({ roomName, playerName }));
+            socket.emit("join_successfull", ({ roomName, playerName }));     
+            const l = Rooms[roomIndex].getPlayers();
+            io.to(roomName).emit("update", (l)); 
         }
     })
 
@@ -125,8 +127,9 @@ io.on("connection", (socket) => {
         const p = new Player(playerName, true, true, roomName, socket.id);
         Rooms.push(new Room(p, roomName, playerCount, playTime));
         socket.join(roomName);
-        console.log("join successful called (server)" + roomName);
         socket.emit("join_successfull", ({ roomName, playerName }));
+        const l = [p];
+        socket.emit("update", (l));
     })
 
     socket.on("send_message", (data) => {
@@ -138,6 +141,19 @@ io.on("connection", (socket) => {
             }
         })
         // io.to(data.room).emit('receive_message', (data));
+    });
+
+    socket.on("start_game", (roomNumber) => {
+        //console.log("andar aaya!") 
+        let timer = 30; 
+        const intervalId = setInterval(() => {
+            if (timer > 0) {
+                timer--;
+                io.to(roomNumber).emit("update_timer", timer); 
+            } else {
+                clearInterval(intervalId);
+            }
+        }, 1000);
     });
 
     socket.on("disconnect", (data) => {

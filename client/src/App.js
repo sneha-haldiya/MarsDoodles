@@ -13,13 +13,12 @@ const App = () => {
     socket.on("join_successfull", ({ roomName, playerName }) => {
       setRoomNumber(roomName);
       setUserName(playerName);
-      console.log("(client)join successful in=" + roomName)
       setLoginVisible(false);
     })
     socket.on("join_unsuccessful", (message) => {
       alert(message);
     })
-  }, [socket, roomNumber, userName])
+  }, [roomNumber, userName])
 
 
 

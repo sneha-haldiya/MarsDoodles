@@ -101,7 +101,6 @@ function Canvas(props) {
         const rect = canvasRef.current.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
-        console.log(x, " : ", y);
         if (drawShape) {
             ctxRef.current.putImageData(cs, 0, 0);
             p2.x = x;

@@ -1,10 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { SocketContext } from '../../../context/socket';
+import { socket } from '../../../context/socket';
 import ChatMessages from './ChatMessages';
 
-
 const Chatbar = ({ roomNumber, userName }) => {
-  const socket = useContext(SocketContext);
+  // const socket = useContext(SocketContext);
   const [message, setMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
 
@@ -32,14 +31,16 @@ const Chatbar = ({ roomNumber, userName }) => {
   }, [socket]);
 
   return (
-    <div className='flex flex-col bg-purple-200 p-2' >
-      <div className='h-[-webkit-fill-available]'>
+    <div className='flex flex-col bg-purple-200'>
+      <div className='flex flex-col grow overflow-x-hidden overflow-y-auto  max-h-[520px] p-2'>
+        <div className='contents flex-1 overflow-y-auto'>
           {messageList.map((messageContent, index) => {
             return (<ChatMessages key={index} isSelf={userName === messageContent.author} {...messageContent} />)
           })}
+        </div>
       </div>
-      <div>
-        <form id='formId' action='' className="flex flex-row" onSubmit={(e) => { e.preventDefault() }}>
+      <div className='flex p-2 pb-1 bg-purple-200'>
+        <form id='formId' action='' style={{width: "100%"}} className="flex flex-row " onSubmit={(e) => { e.preventDefault() }}>
           <input
             type="text"
             placeholder="your guess.."
@@ -54,6 +55,8 @@ const Chatbar = ({ roomNumber, userName }) => {
         </form>
       </div>
     </div>
+
+
   )
 }
 

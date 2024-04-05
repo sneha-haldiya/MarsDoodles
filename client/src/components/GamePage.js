@@ -14,7 +14,7 @@ const GamePage = ({roomNumber ,userName}) => {
   const [mode, setMode] = useState("draw");
   return (
     <div className='flex flex-col border-8 border-white h-dvh w-dvw'>
-      <Header/>
+      <Header  roomNumber={roomNumber}/>
       <SubHeader data={data} setData={setData} setMode={setMode}/>
       <Main roomNumber={roomNumber} userName={userName} data={data} mode={mode}/>
     </div>

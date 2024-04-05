@@ -1,9 +1,9 @@
 import React, { useContext, useState } from 'react'
-import { SocketContext } from '../../context/socket';
+import { socket } from '../../context/socket';
 
 const LandingPage = () => {
-    const socket = useContext(SocketContext);
-
+    // const socket = useContext(SocketContext);
+    // 
     const [playerName, setPlayerName] = useState("");
     const [roomName, setRoomName] = useState("");
     const playerNameRegEx = new RegExp("^[a-zA-Z][a-zA-Z0-9_ ]*");
