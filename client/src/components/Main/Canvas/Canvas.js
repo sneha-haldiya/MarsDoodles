@@ -1,39 +1,27 @@
-import React, { useRef, useEffect, useState, useLayoutEffect } from 'react';
+import React, { useRef, useEffect, useContext } from 'react';
+import { SocketContext } from '../../../context/socket'
 import FloodFill from 'q-floodfill';
 
-function Canvas(props) {
-    
+function Canvas({ data, mode, roomNumber, isLead }) {
     const canvasRef = useRef(null);
     const ctxRef = useRef(null);
-    const [canDraw, setCanDraw] = useState(false);
-    
+    const socket = useContext(SocketContext);
+    // const [canDraw, setCanDraw] = useState(false);
+    let canDraw = false;
+    function setCanDraw(value) {
+        canDraw = value;
+    }
+    // const [coord, setCoord] = useState({x: Number, y: Number});
+    let coord = { x: Number, y: Number };
 
+    function setCoord({ x, y }) {
+        coord.x = x;
+        coord.y = y;
+    }
     let p1 = { x: 0, y: 0 };
     let p2 = { x: 0, y: 0 };
     let drawShape = false;
     let cs;
-
-
-    /* useLayoutEffect(() => {
-        window.addEventListener('resize', updateSize);
-        function updateSize() {
-            if (window.innerWidth > 1024) {
-                canvasRef.current.width = 910;
-                canvasRef.current.height = 564;
-            }
-            else if(window.innerWidth > 768)
-            {
-                canvasRef.current.width = 610;
-                canvasRef.current.height = 564;
-            }
-            else if(window.innerWidth > 324)
-            {
-                canvasRef.current.width = 410;
-                canvasRef.current.height = 560;
-            }
-        }
-    }, []) */
-
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -42,36 +30,70 @@ function Canvas(props) {
         /* context.scale(2, 2); */
         context.lineCap = 'round';
         context.lineJoin = 'round';
-        context.strokeStyle = props.data.color;
+        context.strokeStyle = data.color;
         // context.fillStyle = 'white';
-        context.lineWidth = props.data.size;
+        context.lineWidth = data.size;
         ctxRef.current = context;
-    }, [props.data]);
+    }, [data]);
+
+    socket.on("draw_start_client", ({ xCoord, yCoord }) => {
+        const rect = canvasRef.current.getBoundingClientRect();
+        //console.log(xCoord - rect.left," ", yCoord - rect.top);
+        setCoord({ x: xCoord - rect.left, y: yCoord - rect.top });
+        drawStart();
+    })
+
+    socket.on("draw_client", ({ xCoord, yCoord }) => {
+        const rect = canvasRef.current.getBoundingClientRect();
+        //console.log(xCoord - rect.left," ", yCoord - rect.top);
+        setCoord({ x: xCoord - rect.left, y: yCoord - rect.top });
+        draw();
+    })
+
+    socket.on("draw_end_client", () => {
+        drawEnd();
+    })
+
+    const preDrawStart = (event) => {
+        /* const rect = canvasRef.current.getBoundingClientRect();
+        setCoord({x: event.clientX - rect.left, y: event.clientY - rect.top});
+        drawStart(); */
+        if (isLead)
+        {
+            socket.emit("draw_start", ({ x: event.clientX, y: event.clientY, roomNumber: roomNumber }));
+        }
+    }
+
+    const preDraw = (event) => {
+        /* const rect = canvasRef.current.getBoundingClientRect();
+        setCoord({x: event.clientX - rect.left, y: event.clientY - rect.top});
+        draw(); */
+        if (isLead) {
+            socket.emit("draw", ({ x: event.clientX, y: event.clientY, roomNumber: roomNumber }));
+        }
+    }
+
+    const preDrawEnd = () => {
+        if (isLead) {
+            socket.emit("draw_end", ({ roomNumber }));
+        }
+    }
 
     // Function to draw a circle where the user clicks
-    const drawStart = (event) => {
-        const rect = canvasRef.current.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-        if (props.mode === "floodfill") {
-            let offsetX, offsetY;
-            if (event.targetTouches) {
-                offsetX = Math.round(event.targetTouches[0].pageX - rect.left);
-                offsetY = Math.round(event.targetTouches[0].pageY - rect.top);
-            } else {
-                offsetX = event.nativeEvent.offsetX;
-                offsetY = event.nativeEvent.offsetY;
-            }
+    const drawStart = () => {
+        const x = coord.x;
+        const y = coord.y;
+        if (mode === "floodfill") {
             const imgData = ctxRef.current.getImageData(0, 0, canvasRef.current.width, canvasRef.current.height)
             // Construct flood fill instance
             const floodFill = new FloodFill(imgData)
             // Modify image data
-            floodFill.fill(props.data.color, offsetX, offsetY, 0)
+            floodFill.fill(data.color, x, y, 0)
             // put the modified data back in context
             ctxRef.current.putImageData(floodFill.imageData, 0, 0)
             return;
         }
-        else if (props.mode === "circle" || props.mode === "rectangle") {
+        else if (mode === "circle" || mode === "rectangle") {
             drawShape = true;
             cs = ctxRef.current.getImageData(0, 0, canvasRef.current.width, canvasRef.current.height);
             p1.x = x;
@@ -87,7 +109,8 @@ function Canvas(props) {
         }
     };
 
-    const drawEnd = (event) => {
+    const drawEnd = () => {
+        console.log("drawEnd");
         if (drawShape) {
             drawShape = false;
         }
@@ -97,20 +120,19 @@ function Canvas(props) {
         }
     }
 
-    const draw = (event) => {
-        const rect = canvasRef.current.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
+    const draw = () => {
+        const x = coord.x;
+        const y = coord.y;
         if (drawShape) {
             ctxRef.current.putImageData(cs, 0, 0);
             p2.x = x;
             p2.y = y;
             ctxRef.current.beginPath();
-            if (props.mode === "circle") {
+            if (mode === "circle") {
                 let radius = Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
                 ctxRef.current.arc(p1.x, p1.y, radius, 0, 2 * Math.PI);
             }
-            else if (props.mode === "rectangle") {
+            else if (mode === "rectangle") {
                 ctxRef.current.rect(p1.x, p1.y, -(p1.x - p2.x), -(p1.y - p2.y));
             }
             ctxRef.current.stroke();
@@ -128,10 +150,11 @@ function Canvas(props) {
     return (
         <div>
             <canvas ref={canvasRef}
-                onMouseDown={drawStart}
-                onMouseUp={drawEnd}
-                /* onMouseLeave={drawEnd} */
-                onMouseMove={draw}
+                onMouseDown={preDrawStart}
+                onMouseUp={preDrawEnd}
+                //onMouseLeave={drawEnd}
+                //onMouseOut={preDrawEnd}
+                onMouseMove={preDraw}
                 width={910}
                 height={564}
                 style={{ backgroundColor: "pink" }} />

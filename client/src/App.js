@@ -9,10 +9,14 @@ const App = () => {
   const [loginVisible, setLoginVisible] = useState(true)
   const [roomNumber, setRoomNumber] = useState(0);
   const [userName, setUserName] = useState("");
+  const [isHost, setIsHost] = useState(false);
+  const [isLead, setIsLead] = useState(false);
   useEffect(() => {
-    socket.on("join_successfull", ({ roomName, playerName }) => {
+    socket.on("join_successfull", ({ roomName, playerName, host, lead }) => {
       setRoomNumber(roomName);
       setUserName(playerName);
+      setIsHost(host);
+      setIsLead(lead);
       setLoginVisible(false);
     })
     socket.on("join_unsuccessful", (message) => {
@@ -30,7 +34,7 @@ const App = () => {
           <CreateRoomPage />
         </div>}
         {!loginVisible && <div className=''>
-          <GamePage roomNumber={roomNumber} userName={userName} />
+          <GamePage roomNumber={roomNumber} userName={userName} isHost={isHost} isLead={isLead}/>
         </div>}
       </div>
     </SocketContext.Provider>

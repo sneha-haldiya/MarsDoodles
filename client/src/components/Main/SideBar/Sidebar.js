@@ -1,8 +1,8 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { SocketContext } from '../../../context/socket';
 
 
-const Sidebar = ({roomNumber}) => {
+const Sidebar = ({roomNumber, isHost, isLead}) => {
   const socket = useContext(SocketContext);
   const [list, setList] = useState([]);
 
