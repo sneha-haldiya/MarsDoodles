@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { socket } from '../../../context/socket';
 import ChatMessages from './ChatMessages';
 
@@ -19,7 +19,7 @@ const Chatbar = ({ roomNumber, userName }) => {
 
       //console.log(message);
       socket.emit("send_message", messageData);
-      setMessageList((list) => [...list, messageData]);
+      //setMessageList((list) => [...list, messageData]);
       document.getElementById("formId").reset();
     }
   }
@@ -28,14 +28,14 @@ const Chatbar = ({ roomNumber, userName }) => {
     socket.on("receive_message", (data) => {
       setMessageList((list) => [...list, data]);
     });
-  }, [socket]);
+  }, []);
 
   return (
     <div className='flex flex-col bg-purple-200'>
       <div className='flex flex-col grow overflow-x-hidden overflow-y-auto  max-h-[520px] p-2'>
         <div className='contents flex-1 overflow-y-auto'>
           {messageList.map((messageContent, index) => {
-            return (<ChatMessages key={index} isSelf={userName === messageContent.author} {...messageContent} />)
+            return (<ChatMessages key={index} isbot={messageContent.author === 'GameBot'} isSelf={userName === messageContent.author} {...messageContent} />)
           })}
         </div>
       </div>

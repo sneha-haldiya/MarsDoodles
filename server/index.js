@@ -1,13 +1,25 @@
-const express = require("express");
+import express from "express";
 const app = express();
 
-const http = require("http");
-const { Server } = require("socket.io");
+import http from "http";
+import { Server } from "socket.io";
 
-const cors = require("cors");
+import cors from "cors";
 app.use(cors());
 
 const server = http.createServer(app);
+
+import { generate } from "random-words"
+
+import generateBlanks from "./blanks.js";
+
+import Filter from "bad-words";
+const filter = new Filter();
+
+import formatMessage from "./formatMessage.js";
+
+let word = "";
+let startGame = true;
 
 const Rooms = [];
 class Room {
@@ -51,7 +63,8 @@ class Player {
         this.isHost = isHost
         this.isLead = isLead
         this.roomName = roomName
-        this.points = 0
+        this.points = 0;
+        this.warning = 0;
     }
     getPlayerName() {
         return this.playerName;
@@ -70,6 +83,12 @@ class Player {
     }
     getRoomName() {
         return this.roomName;
+    }
+    setWarning(count) {
+        this.warning = count;
+    }
+    getWarning() {
+        return this.warning;
     }
 }
 
@@ -116,9 +135,9 @@ io.on("connection", (socket) => {
             const player = new Player(playerName, false, false, roomName, socket.id);
             Rooms[roomIndex].addPlayer(player);
             socket.join(roomName);
-            socket.emit("join_successfull", ({ roomName, playerName, host: false, lead: false }));     
+            socket.emit("join_successfull", ({ roomName, playerName, host: false, lead: false }));
             const l = Rooms[roomIndex].getPlayers();
-            io.to(roomName).emit("update", (l)); 
+            io.to(roomName).emit("update", (l));
         }
     })
 
@@ -132,7 +151,7 @@ io.on("connection", (socket) => {
         const p = new Player(playerName, true, true, roomName, socket.id);
         Rooms.push(new Room(p, p, roomName, playerCount, playTime));
         socket.join(roomName);
-        socket.emit("join_successfull", ({ roomName, playerName, host: true , lead: true}));
+        socket.emit("join_successfull", ({ roomName, playerName, host: true, lead: true }));
         const l = [p];
         socket.emit("update", (l));
     })
@@ -141,21 +160,67 @@ io.on("connection", (socket) => {
         console.log(data)
         const p = Rooms[Rooms.map(Room => Room.getRoomName()).indexOf(data.room)].getPlayers();
         p.forEach((player) => {
-            if (player.getPlayerName() !== data.author) {
-                io.to(player.getPlayerSocketId()).emit('receive_message', (data));
+            if (data.mess === word) {
+                const message = formatMessage('GameBot', (player.getPlayerName() !== data.author) ? `YAY, ${data.author} guessed the answer!` : `YAY, You guessed the answer!`, data.time);
+                io.to(player.getPlayerSocketId()).emit('receive_message', (message));
+            }
+            else {
+                const cleanedMessage = formatMessage(data.author, filter.clean(data.mess), data.time);
+                io.to(player.getPlayerSocketId()).emit('receive_message', (cleanedMessage));
+                if (cleanedMessage.mess != data.mess) {
+                    //console.log(player.getWarning(),"warning");
+                    if (player.getPlayerSocketId() === socket.id) {
+                        if (player.getWarning() == 0) {
+                            io.to(player.getPlayerSocketId()).emit('receive_message', formatMessage('GameBot', `⚠️Warning ${player.getWarning() + 1}: DO NOT USE SUCH LANGUAGE OTHERWISE YOU WILL BE PENALISED!!`, data.time));
+                            player.setWarning(player.getWarning() + 1);
+                        }
+                        else if (player.getWarning() == 1) {
+                            io.to(player.getPlayerSocketId()).emit('receive_message', formatMessage('GameBot', `⚠️Warning ${player.getWarning() + 1}: 50 POINTS DEDUCTED. NEXT TIME YOU WILL BE KICKED OUT!!`, data.time));
+                            player.setWarning(player.getWarning() + 1);
+                        }
+                        else {
+                            socket.leave();
+                        }
+                    }
+                }
             }
         })
         // io.to(data.room).emit('receive_message', (data));
     });
 
     socket.on("start_game", (roomNumber) => {
+        if(!startGame)
+        return;
+        let randomWord = generate({ minLength: 4, maxLength: 10 });
+        word = randomWord;
+        let blanks = generateBlanks(randomWord);
+
+        const room = Rooms.find(Room => Room.getRoomName() === roomNumber);
+        if (room) {
+            const players = room.getPlayers();
+            players.forEach(player => {
+                if (player.getIsLead()) {
+                    console.log(player.getPlayerName(), "host");
+
+                    //console.log("randomWord~~",randomWord)
+                    socket.emit("displayWord", randomWord);
+                }
+                else {
+                    //console.log("blanks~~",blanks);
+                    socket.to(roomNumber).emit("displayWord", blanks);
+                }
+            });
+        }
+
         //console.log("andar aaya!") 
-        let timer = 30; 
+        let timer = 30;
         const intervalId = setInterval(() => {
+            startGame = false;
             if (timer > 0) {
                 timer--;
-                io.to(roomNumber).emit("update_timer", timer); 
+                io.to(roomNumber).emit("update_timer", timer);
             } else {
+                startGame = true;
                 clearInterval(intervalId);
             }
         }, 1000);
@@ -165,34 +230,34 @@ io.on("connection", (socket) => {
         return Rooms[Rooms.map((room) => room.getRoomName()).indexOf(roomname)].getLead().getPlayerSocketId() === socketId;
     }
 
-    socket.on("draw_start", ({x, y, roomNumber}) => {
-        if(verifyLead(roomNumber, socket.id))
-        io.to(roomNumber).emit("draw_start_client", {xCoord: x, yCoord: y});
+    socket.on("draw_start", ({ x, y, roomNumber }) => {
+        if (verifyLead(roomNumber, socket.id))
+            io.to(roomNumber).emit("draw_start_client", { xCoord: x, yCoord: y });
     })
 
-    socket.on("draw", ({x, y, roomNumber}) => {
-        if(verifyLead(roomNumber, socket.id))
-        io.to(roomNumber).emit("draw_client", {xCoord: x, yCoord: y});
+    socket.on("draw", ({ x, y, roomNumber }) => {
+        if (verifyLead(roomNumber, socket.id))
+            io.to(roomNumber).emit("draw_client", { xCoord: x, yCoord: y });
     })
 
-    socket.on("draw_end", ({roomNumber}) => {
-        if(verifyLead(roomNumber, socket.id))
-        io.to(roomNumber).emit("draw_end_client");
+    socket.on("draw_end", ({ roomNumber }) => {
+        if (verifyLead(roomNumber, socket.id))
+            io.to(roomNumber).emit("draw_end_client");
     })
 
-    socket.on("set_color", ({color, roomNumber}) => {
-        if(verifyLead(roomNumber, socket.id))
-        io.to(roomNumber).emit("set_color_client", ({penColor: color}));
+    socket.on("set_color", ({ color, roomNumber }) => {
+        if (verifyLead(roomNumber, socket.id))
+            io.to(roomNumber).emit("set_color_client", ({ penColor: color }));
     })
 
-    socket.on("set_size", ({size, roomNumber}) => {
-        if(verifyLead(roomNumber, socket.id))
-        io.to(roomNumber).emit("set_size_client", ({brushSize: size}));
+    socket.on("set_size", ({ size, roomNumber }) => {
+        if (verifyLead(roomNumber, socket.id))
+            io.to(roomNumber).emit("set_size_client", ({ brushSize: size }));
     })
 
-    socket.on("set_mode", ({mode, roomNumber}) => {
-        if(verifyLead(roomNumber, socket.id))
-        io.to(roomNumber).emit("set_mode_client", ({brushMode: mode}));
+    socket.on("set_mode", ({ mode, roomNumber }) => {
+        if (verifyLead(roomNumber, socket.id))
+            io.to(roomNumber).emit("set_mode_client", ({ brushMode: mode }));
     })
 
     socket.on("disconnect", (data) => {
