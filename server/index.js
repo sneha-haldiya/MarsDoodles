@@ -230,24 +230,15 @@ io.on("connection", (socket) => {
         return Rooms[Rooms.map((room) => room.getRoomName()).indexOf(roomname)].getLead().getPlayerSocketId() === socketId;
     }
 
-    socket.on("draw_start", ({ x, y, roomNumber }) => {
-        if (verifyLead(roomNumber, socket.id))
-            io.to(roomNumber).emit("draw_start_client", { xCoord: x, yCoord: y });
-    })
-
-    socket.on("draw", ({ x, y, roomNumber }) => {
-        if (verifyLead(roomNumber, socket.id))
-            io.to(roomNumber).emit("draw_client", { xCoord: x, yCoord: y });
-    })
-
-    socket.on("draw_end", ({ roomNumber }) => {
-        if (verifyLead(roomNumber, socket.id))
-            io.to(roomNumber).emit("draw_end_client");
-    })
 
     socket.on("set_color", ({ color, roomNumber }) => {
         if (verifyLead(roomNumber, socket.id))
             io.to(roomNumber).emit("set_color_client", ({ penColor: color }));
+    })
+
+    socket.on("send_data", ({image, roomNumber}) => {
+        console.log("got data");
+        socket.broadcast.to(roomNumber).emit("receive_image", ({image}));
     })
 
     socket.on("set_size", ({ size, roomNumber }) => {
