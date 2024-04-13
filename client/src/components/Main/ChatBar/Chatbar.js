@@ -13,8 +13,6 @@ const Chatbar = ({ roomNumber, userName }) => {
         room: roomNumber,
         author: userName,
         mess: message,
-        time:
-          new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
       };
 
       //console.log(message);

@@ -13,13 +13,18 @@ import { generate } from "random-words"
 
 import generateBlanks from "./blanks.js";
 
+import getDate from "./getDate.js";
+
 import Filter from "bad-words";
 const filter = new Filter();
 
 import formatMessage from "./formatMessage.js";
 
 let word = "";
+let blanks = "";
 let startGame = true;
+
+
 
 const Rooms = [];
 class Room {
@@ -34,7 +39,12 @@ class Room {
     }
     addPlayer(player) {
         this.Players.push(player)
-        console.log(this.Players);
+    }
+    removePlayer(playerId) {
+        const index = this.Players.map(player => player.getPlayerSocketId()).indexOf(playerId);
+        const player = this.Players[index];
+        this.Players.splice(index, 1);
+        return player.getPlayerName();
     }
     getPlayers() {
         return this.Players;
@@ -102,8 +112,6 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
 
     socket.on("join_room", ({ playerName, roomName }) => {
-        console.log(Rooms)
-        console.log(roomName)
         let roomFound = false;
         let playerFound = false;
         let roomIndex = -1;
@@ -111,7 +119,6 @@ io.on("connection", (socket) => {
             if (parseInt(Rooms[i].getRoomName()) == parseInt(roomName)) {
                 roomIndex = i;
                 roomFound = true;
-                console.log(Rooms[i].getPlayers())
                 Rooms[i].getPlayers().forEach((player) => {
                     if (player.getPlayerName().toString() === playerName.toString())
                         playerFound = true;
@@ -138,11 +145,14 @@ io.on("connection", (socket) => {
             socket.emit("join_successfull", ({ roomName, playerName, host: false, lead: false }));
             const l = Rooms[roomIndex].getPlayers();
             io.to(roomName).emit("update", (l));
+            const message = formatMessage('GameBot', `Welcome to Mars Doodles, ${playerName}`, getDate());
+            io.to(roomName).emit('receive_message', (message));
+            if(!startGame)
+            socket.emit("display_word", (blanks));
         }
     })
 
     socket.on("create_room", ({ playerName, playerCount, playTime }) => {
-        console.log({ playerName, playerCount, playTime } + " create room init(server)")
         let roomName;
         while (roomName == undefined || Rooms.map(room => room.roomname).indexOf(roomName) != -1) {
             roomName = Math.floor(Math.random() * 100000);
@@ -154,28 +164,29 @@ io.on("connection", (socket) => {
         socket.emit("join_successfull", ({ roomName, playerName, host: true, lead: true }));
         const l = [p];
         socket.emit("update", (l));
+        const message = formatMessage('GameBot', `Welcome to Mars Doodles, ${playerName}`, getDate());
+        io.to(roomName).emit('receive_message', (message));
     })
 
     socket.on("send_message", (data) => {
-        console.log(data)
         const p = Rooms[Rooms.map(Room => Room.getRoomName()).indexOf(data.room)].getPlayers();
         p.forEach((player) => {
             if (data.mess === word) {
-                const message = formatMessage('GameBot', (player.getPlayerName() !== data.author) ? `YAY, ${data.author} guessed the answer!` : `YAY, You guessed the answer!`, data.time);
+                const message = formatMessage('GameBot', (player.getPlayerName() !== data.author) ? `YAY, ${data.author} guessed the answer!` : `YAY, You guessed the answer!`, getDate());
                 io.to(player.getPlayerSocketId()).emit('receive_message', (message));
             }
             else {
-                const cleanedMessage = formatMessage(data.author, filter.clean(data.mess), data.time);
+                const cleanedMessage = formatMessage(data.author, filter.clean(data.mess), getDate());
                 io.to(player.getPlayerSocketId()).emit('receive_message', (cleanedMessage));
                 if (cleanedMessage.mess != data.mess) {
                     //console.log(player.getWarning(),"warning");
                     if (player.getPlayerSocketId() === socket.id) {
                         if (player.getWarning() == 0) {
-                            io.to(player.getPlayerSocketId()).emit('receive_message', formatMessage('GameBot', `⚠️Warning ${player.getWarning() + 1}: DO NOT USE SUCH LANGUAGE OTHERWISE YOU WILL BE PENALISED!!`, data.time));
+                            io.to(player.getPlayerSocketId()).emit('receive_message', formatMessage('GameBot', `⚠️Warning ${player.getWarning() + 1}: DO NOT USE SUCH LANGUAGE OTHERWISE YOU WILL BE PENALISED!!`, getDate()));
                             player.setWarning(player.getWarning() + 1);
                         }
                         else if (player.getWarning() == 1) {
-                            io.to(player.getPlayerSocketId()).emit('receive_message', formatMessage('GameBot', `⚠️Warning ${player.getWarning() + 1}: 50 POINTS DEDUCTED. NEXT TIME YOU WILL BE KICKED OUT!!`, data.time));
+                            io.to(player.getPlayerSocketId()).emit('receive_message', formatMessage('GameBot', `⚠️Warning ${player.getWarning() + 1}: 50 POINTS DEDUCTED. NEXT TIME YOU WILL BE KICKED OUT!!`, getDate()));
                             player.setWarning(player.getWarning() + 1);
                         }
                         else {
@@ -188,26 +199,22 @@ io.on("connection", (socket) => {
         // io.to(data.room).emit('receive_message', (data));
     });
 
-    socket.on("start_game", (roomNumber) => {
-        if(!startGame)
-        return;
-        let randomWord = generate({ minLength: 4, maxLength: 10 });
-        word = randomWord;
-        let blanks = generateBlanks(randomWord);
-
+    socket.on("start_game", ({ roomNumber }) => {
+        if (!startGame)
+            return;
+        word = generate({ minLength: 4, maxLength: 10 });
+        blanks = generateBlanks(word);
         const room = Rooms.find(Room => Room.getRoomName() === roomNumber);
         if (room) {
             const players = room.getPlayers();
             players.forEach(player => {
                 if (player.getIsLead()) {
-                    console.log(player.getPlayerName(), "host");
-
                     //console.log("randomWord~~",randomWord)
-                    socket.emit("displayWord", randomWord);
+                    socket.emit("display_word", (word));
                 }
                 else {
                     //console.log("blanks~~",blanks);
-                    socket.to(roomNumber).emit("displayWord", blanks);
+                    socket.broadcast.to(roomNumber).emit("display_word", (blanks));
                 }
             });
         }
@@ -236,9 +243,8 @@ io.on("connection", (socket) => {
             io.to(roomNumber).emit("set_color_client", ({ penColor: color }));
     })
 
-    socket.on("send_data", ({image, roomNumber}) => {
-        console.log("got data");
-        socket.broadcast.to(roomNumber).emit("receive_image", ({image}));
+    socket.on("send_data", ({ image, roomNumber }) => {
+        socket.broadcast.to(roomNumber).emit("receive_image", ({ image }));
     })
 
     socket.on("set_size", ({ size, roomNumber }) => {
@@ -249,6 +255,15 @@ io.on("connection", (socket) => {
     socket.on("set_mode", ({ mode, roomNumber }) => {
         if (verifyLead(roomNumber, socket.id))
             io.to(roomNumber).emit("set_mode_client", ({ brushMode: mode }));
+    })
+
+    socket.on("request_disconnect", ({ roomNumber }) => {
+        const playerName = Rooms[Rooms.map(Room => Room.getRoomName()).indexOf(roomNumber)].removePlayer(socket.id);
+        const l = Rooms[Rooms.map(Room => Room.getRoomName()).indexOf(roomNumber)].getPlayers();
+        socket.broadcast.to(roomNumber).emit("update", (l));
+        const message = formatMessage('GameBot', `${playerName} has left the room.`, getDate());
+        io.to(roomNumber).emit('receive_message', (message));
+        socket.emit("disconnect_granted");
     })
 
     socket.on("disconnect", (data) => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import JoinPage from './components/LandingPage/JoinPage'
 import CreateRoomPage from './components/LandingPage/CreateRoomPage'
 import GamePage from './components/GamePage'
@@ -11,20 +11,20 @@ const App = () => {
   const [userName, setUserName] = useState("");
   const [isHost, setIsHost] = useState(false);
   const [isLead, setIsLead] = useState(false);
-  useEffect(() => {
-    socket.on("join_successfull", ({ roomName, playerName, host, lead }) => {
-      setRoomNumber(roomName);
-      setUserName(playerName);
-      setIsHost(host);
-      setIsLead(lead);
-      setLoginVisible(false);
-    })
-    socket.on("join_unsuccessful", (message) => {
-      alert(message);
-    })
-  }, [roomNumber, userName])
+  socket.on("join_successfull", ({ roomName, playerName, host, lead }) => {
+    setRoomNumber(roomName);
+    setUserName(playerName);
+    setIsHost(host);
+    setIsLead(lead);
+    setLoginVisible(false);
+  })
+  socket.on("join_unsuccessful", (message) => {
+    alert(message);
+  })
 
-
+  socket.on("disconnect_granted", () => {
+    setLoginVisible(true);
+  })
 
   return (
     <SocketContext.Provider value={socket}>
@@ -34,7 +34,7 @@ const App = () => {
           <CreateRoomPage />
         </div>}
         {!loginVisible && <div className=''>
-          <GamePage roomNumber={roomNumber} userName={userName} isHost={isHost} isLead={isLead}/>
+          <GamePage roomNumber={roomNumber} userName={userName} isHost={isHost} isLead={isLead} />
         </div>}
       </div>
     </SocketContext.Provider>
