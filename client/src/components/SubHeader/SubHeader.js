@@ -5,9 +5,12 @@ import ColourPalette from '../Main/Canvas/ColourPalette'
 
 const SubHeader = (props) => {
   const socket = useContext(SocketContext);
-  const [timer, setTimer] = useState(30);
-
-  socket.on("update_timer", (updatedTimer) => {
+  const [timer, setTimer] = useState(0);
+  socket.on("set_time_init", ({time}) => {
+    setTimer(time);
+  })
+  socket.on("update_timer", ({updatedTimer}) => {
+    console.log(updatedTimer);
     setTimer(updatedTimer);
   });
 

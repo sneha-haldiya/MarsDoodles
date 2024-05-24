@@ -24,6 +24,10 @@ const App = () => {
 
   socket.on("disconnect_granted", () => {
     setLoginVisible(true);
+    setRoomNumber(0);
+    setUserName("");
+    setIsHost(false);
+    setIsLead(false);
   })
 
   return (

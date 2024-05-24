@@ -6,7 +6,7 @@ const LandingPage = () => {
     const [playerName, setPlayerName] = useState("");
     const [playerCount, setPlayerCount] = useState(2);
     const [playTime, setPlayTime] = useState("");
-    const playerNameRegEx = new RegExp("^[a-zA-Z][a-zA-Z0-9_ ]*");
+    const playerNameRegEx = /^[a-zA-Z][a-zA-Z0-9_ ]*/;
 
     const onCreateGame = () => {
         if (!playerNameRegEx.test(playerName)) {
@@ -39,7 +39,7 @@ const LandingPage = () => {
                     <hr className='mt-0.5 mb-1.5' />
                     <ul className="flex flex-row justify-between">
                         <li>
-                            <input type="radio" id="time030" name="hosting" value="time030" className="hidden peer" onClick={e => setPlayTime("0:30")} />
+                            <input type="radio" id="time030" name="hosting" value="time030" className="hidden peer" onClick={e => setPlayTime(30)} />
                             <label htmlFor="time030" className="inline-flex items-center justify-between w-full p-1 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
                                 <div className="block">
                                     <div className="text-xs font-semibold">0:30</div>
@@ -47,7 +47,7 @@ const LandingPage = () => {
                             </label>
                         </li>
                         <li>
-                            <input type="radio" id="time100" name="hosting" value="time100" className="hidden peer" onClick={e => setPlayTime("1:00")} />
+                            <input type="radio" id="time100" name="hosting" value="time100" className="hidden peer" onClick={e => setPlayTime(60)} />
                             <label htmlFor="time100" className="inline-flex items-center justify-between w-full p-1 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
                                 <div className="block">
                                     <div className="text-xs font-semibold">1:00</div>
@@ -55,7 +55,7 @@ const LandingPage = () => {
                             </label>
                         </li>
                         <li>
-                            <input type="radio" id="time130" name="hosting" value="time130" className="hidden peer" onClick={e => setPlayTime("1:30")} />
+                            <input type="radio" id="time130" name="hosting" value="time130" className="hidden peer" onClick={e => setPlayTime(90)} />
                             <label htmlFor="time130" className="inline-flex items-center justify-between w-full p-1 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
                                 <div className="block">
                                     <div className="text-xs font-semibold">1:30</div>
@@ -63,7 +63,7 @@ const LandingPage = () => {
                             </label>
                         </li>
                         <li>
-                            <input type="radio" id="time200" name="hosting" value="time200" className="hidden peer" onClick={e => setPlayTime("2:00")} />
+                            <input type="radio" id="time200" name="hosting" value="time200" className="hidden peer" onClick={e => setPlayTime(120)} />
                             <label htmlFor="time200" className="inline-flex items-center justify-between w-full p-1 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
                                 <div className="block">
                                     <div className="text-xs font-semibold">2:00</div>

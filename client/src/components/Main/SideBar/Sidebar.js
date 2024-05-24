@@ -8,7 +8,7 @@ const Sidebar = ({roomNumber, isHost, isLead}) => {
 
   socket.on("update", (l) => {
     setList(l.map((p, index) => 
-      <li key={index}>{p.playerName}</li>
+      <li key={index}>{p.playerName}{p.isHost ? " (Host)" : null}{p.isLead ? " (Lead)" : null}</li>
     ))
   });
 
