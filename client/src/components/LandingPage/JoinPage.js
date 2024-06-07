@@ -10,6 +10,7 @@ const LandingPage = () => {
     const roomNameRegEx = new RegExp("^[0-9]+")
 
     const onJoinGame = () => {
+        socket.connect();
         if(!playerNameRegEx.test(playerName) || !roomNameRegEx.test(roomName))
         {
             alert("Enter the name starting with an alphabet");

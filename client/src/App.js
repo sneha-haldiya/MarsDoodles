@@ -18,6 +18,13 @@ const App = () => {
     setIsLead(lead);
     setLoginVisible(false);
   })
+
+  socket.on("update_host", ({host}) => {
+    setIsHost(host);
+  })
+  socket.on("update_lead", ({lead}) => {
+    setIsLead(lead);
+  })
   socket.on("join_unsuccessful", (message) => {
     alert(message);
   })
@@ -28,6 +35,7 @@ const App = () => {
     setUserName("");
     setIsHost(false);
     setIsLead(false);
+    socket.disconnect();
   })
 
   return (

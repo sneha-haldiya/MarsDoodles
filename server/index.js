@@ -35,6 +35,8 @@ class Room {
         this.Players = [];
         this.Players.push(host);
         this.host = host;
+        this.hostIndex = 0;
+        this.leadIndex = 0;
         this.lead = lead;
         this.playerCount = playerCount;
         this.timer = timer;
@@ -48,8 +50,7 @@ class Room {
         this.Players.splice(index, 1);
         return player.getPlayerName();
     }
-    getPlayer(playerId)
-    {
+    getPlayer(playerId) {
         return this.Players.map(player => player.getPlayerSocketId() === playerId);
     }
     getPlayers() {
@@ -59,13 +60,65 @@ class Room {
         return this.host;
     }
     changeHost() {
-        /* TODO */
+        let newIndex = -1;
+        if (this.Players.length == 1)
+            return;
+        else if (this.Players.length == 2)
+            newIndex = this.hostIndex == 0 ? 1 : 0;
+        else {
+            while (newIndex == -1 || newIndex == this.hostIndex) {
+                newIndex = Math.floor(Math.random() * 100) % this.Players.length;
+            }
+        }
+        for (let i = 0; i < this.Players.length; i++) {
+            if (i === newIndex) {
+                this.Players[i].isHost = true;
+                io.to(this.Players[i].getPlayerSocketId()).emit("update_host", { host: true });
+            }
+            else {
+                this.Players[i].isHost = false;
+                io.to(this.Players[i].getPlayerSocketId()).emit("update_host", { host: false });
+            }
+        }
+        this.host = this.Players[newIndex];
+        this.hostIndex = newIndex;
+        console.log(JSON.stringify(Rooms));
+        const l = this.Players;
+        io.to(this.roomname).emit("update", (l));
+        const message = formatMessage('GameBot', `${this.Players[newIndex].getPlayerName()} is the new host!`, getDate());
+        io.to(this.roomname).emit('receive_message', (message));
     }
     getLead() {
         return this.lead;
     }
     changeLead() {
-        /* TODO */
+        let newIndex = -1;
+        if (this.Players.length == 1)
+            return;
+        else if (this.Players.length == 2)
+            newIndex = this.leadIndex == 0 ? 1 : 0;
+        else {
+            while (newIndex == -1 || newIndex == this.leadIndex) {
+                newIndex = Math.floor(Math.random() * 100) % this.Players.length;
+            }
+        }
+        for (let i = 0; i < this.Players.length; i++) {
+            if (i === newIndex) {
+                this.Players[i].isLead = true;
+                io.to(this.Players[i].getPlayerSocketId()).emit("update_lead", { lead: true });
+            }
+            else {
+                this.Players[i].isLead = false;
+                io.to(this.Players[i].getPlayerSocketId()).emit("update_lead", { lead: false });
+            }
+        }
+        this.lead = this.Players[newIndex];
+        this.leadIndex = newIndex;
+        console.log(JSON.stringify(Rooms));
+        const l = this.Players;
+        io.to(this.roomname).emit("update", (l));
+        const message = formatMessage('GameBot', `${this.Players[newIndex].getPlayerName()} is the new lead!`, getDate());
+        io.to(this.roomname).emit('receive_message', (message));
     }
     getRoomName() {
         return this.roomname;
@@ -160,9 +213,9 @@ io.on("connection", (socket) => {
             io.to(roomName).emit('receive_message', (message));
             const playTime = Rooms[roomIndex].getTimer();
             const outTime = Math.floor(playTime / 60) + ":" + playTime % 60;
-            socket.emit("set_time_init", ({time: outTime}));
-            if(!startGame)
-            socket.emit("display_word", (blanks));
+            socket.emit("set_time_init", ({ time: outTime }));
+            if (!startGame)
+                socket.emit("display_word", (blanks));
         }
 
     })
@@ -182,7 +235,7 @@ io.on("connection", (socket) => {
         const message = formatMessage('GameBot', `Welcome to Mars Doodles, ${playerName}`, getDate());
         io.to(roomName).emit('receive_message', (message));
         const outTime = Math.floor(playTime / 60) + ":" + playTime % 60;
-        socket.emit("set_time_init", ({time: outTime}));
+        socket.emit("set_time_init", ({ time: outTime }));
     })
 
     socket.on("send_message", (data) => {
@@ -221,7 +274,8 @@ io.on("connection", (socket) => {
         startGame = true;
         word = generate({ minLength: 4, maxLength: 10 });
         blanks = generateBlanks(word);
-        const room = Rooms/* .find(Room => Room.getRoomName() === roomNumber) */[getRoomIndex(Rooms, roomNumber)];
+        let roomIndex = getRoomIndex(Rooms, roomNumber);
+        const room = Rooms/* .find(Room => Room.getRoomName() === roomNumber) */[roomIndex];
         if (room) {
             const players = room.getPlayers();
             players.forEach(player => {
@@ -236,31 +290,32 @@ io.on("connection", (socket) => {
             });
             let timer = parseInt(room.getTimer());
             const intervalId = setInterval(() => {
-                
+
                 if (timer > 0) {
                     console.log(timer);
                     timer--;
                     const outTime = Math.floor(timer / 60) + ":" + timer % 60;
-                    io.to(roomNumber).emit("update_timer", ({updatedTimer: outTime}));
+                    io.to(roomNumber).emit("update_timer", ({ updatedTimer: outTime }));
                 } else {
                     clearInterval(intervalId);
-                    endGame(room.getTimer());
+                    endGame(room.getTimer(), roomIndex);
                 }
             }, 1000);
         }
     });
-    const endGame = (time) => {
+    const endGame = (time, roomIndex) => {
         startGame = false;
         const outTime = Math.floor(time / 60) + ":" + time % 60;
-        socket.emit("set_time_init", ({time: outTime}));
+        io.to(Rooms[roomIndex].getRoomName()).emit("set_time_init", ({ time: outTime }));
         word = "";
         blanks = "";
-        socket.emit("display_word", (word));
-        socket.emit("toggle_start_button");
+        io.to(Rooms[roomIndex].getRoomName()).emit("display_word", (word));
+        Rooms[roomIndex].changeLead();
+        io.to(Rooms[roomIndex].getRoomName()).emit("toggle_start_button");
     }
 
     const verifyLead = (roomname, socketId) => {
-        return Rooms[/* Rooms.map((room) => room.getRoomName()).indexOf(roomname) */getRoomIndex(roomname)].getLead().getPlayerSocketId() === socketId;
+        return Rooms[/* Rooms.map((room) => room.getRoomName()).indexOf(roomname) */getRoomIndex(Rooms, roomname)].getLead().getPlayerSocketId() === socketId;
     }
 
 
@@ -284,15 +339,23 @@ io.on("connection", (socket) => {
     })
 
     socket.on("request_disconnect", ({ roomNumber }) => {
-        const index = getRoomIndex(Rooms, roomNumber);
-        const playerName = Rooms[index].removePlayer(socket.id);
-        const l = Rooms[index].getPlayers();
-        socket.broadcast.to(roomNumber).emit("update", (l));
-        const message = formatMessage('GameBot', `${playerName} has left the room.`, getDate());
-        io.to(roomNumber).emit('receive_message', (message));
         socket.emit("disconnect_granted");
     })
 
+    socket.on("disconnecting", () => {
+        const roomNumber = Array.from((socket.rooms).values())[1];
+        const socketId = socket.id;
+        const index = getRoomIndex(Rooms, roomNumber);
+        if(Rooms[index].getHost().getPlayerSocketId() === socketId)
+            Rooms[index].changeHost();
+        if(Rooms[index].getLead().getPlayerSocketId() === socketId)
+            Rooms[index].changeLead();
+        const playerName = Rooms[index].removePlayer(socketId);
+        const l = Rooms[index].getPlayers();
+        io.to(roomNumber).emit("update", (l));
+        const message = formatMessage('GameBot', `${playerName} has left the room.`, getDate());
+        io.to(roomNumber).emit('receive_message', (message));
+    })
     socket.on("disconnect", (data) => {
         console.log(data, "has disconnected");
     })
@@ -300,6 +363,6 @@ io.on("connection", (socket) => {
 
 server.listen(3001, () => {
     console.log("Server Connected");
-}) 
+})
 
 //deal with disconnection

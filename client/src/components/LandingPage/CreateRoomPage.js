@@ -9,6 +9,7 @@ const LandingPage = () => {
     const playerNameRegEx = /^[a-zA-Z][a-zA-Z0-9_ ]*/;
 
     const onCreateGame = () => {
+        socket.connect();
         if (!playerNameRegEx.test(playerName)) {
             alert("Enter the name starting with an alphabet");
             return;

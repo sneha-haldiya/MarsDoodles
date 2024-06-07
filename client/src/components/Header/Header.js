@@ -1,11 +1,10 @@
 import React , { useState } from 'react'
 import { socket } from '../../context/socket';
 
-const Header = ({ roomNumber, isHost }) => {
+const Header = ({ roomNumber, isLead }) => {
   const [randomWord, setRandomWord] = useState("");
   const [visStartButton, setVisStartButton] = useState(true);
   const startGame = () => {
-    //console.log("start_game trigger hua!")
     socket.emit("start_game", ({roomNumber}));
   };
 
@@ -24,7 +23,7 @@ const Header = ({ roomNumber, isHost }) => {
   return (
     <div className='flex items-center justify-between rounded-t-md bg-slate-200 w-[-webkit-fill-available] p-2'>
       <h2 className=''>Mars Doodles</h2>
-      {isHost && visStartButton && <button onClick={startGame}>Start Game</button>}
+      {isLead && visStartButton && <button onClick={startGame}>Start Game</button>}
       <p>{randomWord}</p>
       <button onClick={request_disconnect} className='p-1 pl-2 pr-2 bg-red-500'>Leave</button>
     </div>
