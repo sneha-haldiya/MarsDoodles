@@ -29,8 +29,8 @@ const Chatbar = ({ roomNumber, userName }) => {
   }, []);
 
   return (
-    <div className='flex flex-col bg-purple-200'>
-      <div className='flex flex-col grow overflow-x-hidden overflow-y-auto  max-h-[520px] p-2'>
+    <div className='flex flex-col bg-[#F0D3FF] '>
+      <div className='flex flex-col grow overflow-x-hidden overflow-y-auto max-h-[520px] p-2 '>
         <div className='contents flex-1 overflow-y-auto'>
           {messageList.map((messageContent, index) => {
             return (<ChatMessages key={index} isbot={messageContent.author === 'GameBot'} isSelf={userName === messageContent.author} {...messageContent} />)
@@ -41,9 +41,9 @@ const Chatbar = ({ roomNumber, userName }) => {
         <form id='formId' action='' style={{width: "100%"}} className="flex flex-row " onSubmit={(e) => { e.preventDefault() }}>
           <input
             type="text"
-            placeholder="your guess.."
+            placeholder="Enter your guess..."
             autoComplete="off"
-            className="rounded-l-md focus:outline-none w-[-webkit-fill-available] p-1 pl-2 pr-2 xl:text-md lg:text-md md:text-sm"
+            className="rounded-l-md focus:outline-none w-[-webkit-fill-available] p-1 pl-2 pr-2 xl:text-md lg:text-md md:text-sm  border-purple-600 border-2"
             onChange={(event) => { setMessage(event.target.value) }}
           />
           <button type='submit' className="bg-purple-600 text-white rounded-r-md justify-self-end"

@@ -10,10 +10,14 @@ const GamePage = ({roomNumber ,userName, isHost, isLead}) => {
     setRoomNum(roomNumber);
     setname(userName);
   }, [roomNumber,userName]) */
-  const [data, setData] = useState({ color: "#ffffff", size: "8" })
+  const [data, setData] = useState({ color: "#FFC0CB", size: "8" })
   const [mode, setMode] = useState("draw");
   return (
-    <div className='flex flex-col border-8 border-white h-dvh w-dvw'>
+    <div className='flex flex-col p-4 h-dvh w-dvw' style={{
+      backgroundImage: "url('https://img.freepik.com/premium-photo/sapphire-serenity-blur-abstract-background-captivating-sapphire-hues_954894-11575.jpg')",
+      backgroundSize: 'cover',
+      backgroundPosition: 'center'
+    }}>
       <Header  roomNumber={roomNumber} isLead={isLead}/>
       <SubHeader data={data} setData={setData} setMode={setMode} roomNumber={roomNumber} isLead={isLead}/>
       <Main roomNumber={roomNumber} userName={userName} data={data} mode={mode} isHost={isHost} isLead={isLead}/>

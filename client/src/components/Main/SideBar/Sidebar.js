@@ -13,10 +13,10 @@ const Sidebar = ({roomNumber, isHost, isLead}) => {
   });
 
   return (
-    <div className='flex flex-col bg-pink-200 max-w-full p-5'>
-      <h1 className='font-bold'>Room Id:</h1>
+    <div className='flex flex-col bg-[#9f71db] max-w-full p-5 text-white text-base rounded-bl-md'>
+      <h1 className='font-bold'><i class="fas fa-comments"></i> Room Id :</h1>
       <h1>{roomNumber}</h1>
-      <h1  className='font-bold'>Players:</h1>
+      <h1  className='font-bold'><i class="fas fa-users"></i> Players :</h1>
       <div className='list-none'>{list}</div>
     </div>
   )

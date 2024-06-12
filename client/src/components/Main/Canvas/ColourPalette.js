@@ -32,8 +32,8 @@ const ColourPalette = (props) => {
     <>
     {isLead && <div className='flex justify-evenly items-center w-[-webkit-fill-available]'>
       <input type='color' className='outline-none size-8' onChange={setColor} value={props.data.color} />
-      <input type='range' min="2" max="20" step="2" onChange={setSize} value={props.data.size} />
-      <div className='flex'>
+      <input type='range' min="2" max="20" step="2" onChange={setSize} value={props.data.size} id='brushSizeSlider'/>
+      <div className='flex justify-between space-x-2'>
           <button className='bg-yellow-300 pt-1 p-2 rounded-xl w-[-webkit-fill-available] ' onClick={() => setMode("brush")}>pencil</button>
           <button className='bg-red-300 pt-1 p-2 rounded-xl w-[-webkit-fill-available] ' onClick={() => setMode("circle")}>circle</button>
           <button className='bg-blue-300 pt-1 p-2 rounded-xl w-[-webkit-fill-available] ' onClick={() => setMode("rectangle")}>rectangle</button>

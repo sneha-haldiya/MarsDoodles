@@ -5,9 +5,9 @@ const TextBot
     console.log("component m hu")
     return (
         <div className='flex justify-center container m-1 overflow-x-hidden'>
-            <div className="h-min w-[90%] p-2 bg-gray-200 text-black rounded-lg">
+            <div className="h-min w-[90%] p-2 bg-gray-200 text-black rounded-lg text-sm">
                 <p className="font-semibold">{data.author}🤖</p>
-                <p className='text-center text-md mb-1 break-all'>{data.mess}</p>
+                <p className='text-center mb-1 break-all'>{data.mess}</p>
                 <p className='text-xs'>{data.time}</p>
             </div>
         </div>

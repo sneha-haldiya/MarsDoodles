@@ -29,21 +29,21 @@ const LandingPage = () => {
 
     return (
         <div className='bg-black bg-opacity-20 p-4 rounded-md'>
-            <div className='flex flex-col'>
-
-                <input type='text' placeholder='Enter GamerTag' className='p-2 pt-1 pb-1 outline-0 rounded-md' id='Name' onChange={e => setPlayerName(e.target.value)} required />
-                <br />
-                <input type='number' min={2} max={10} placeholder='Enter Player Count' className='p-2 pt-1 pb-1 outline-0 rounded-md' id='Count' onChange={e => setPlayerCount(e.target.value)} onKeyDown={() => { }} required />
-                <br />
-                <div className='flex flex-col w-100 bg-slate-500 p-2 rounded-md'>
-                    <h4 className='font-bold font-white self-center'>Choose Time</h4>
+            <div className='flex flex-col'>  
+				<label className='text-left text-base text-white font-semibold mb-1'>Player Name <i class="fas fa-hand-point-down"></i></label>
+                <input type='text' placeholder='Enter GamerTag' className='p-2 pt-1 pb-1 mb-3 outline-0 border border-gray-300 rounded-md' id='Name' onChange={e => setPlayerName(e.target.value)} required />
+				<label className='text-left text-base text-white font-semibold mb-1'>Players <i class="fas fa-hand-point-down"></i></label>
+                <input type='number' min={2} max={10} placeholder='Enter Player Count'  className='p-2 pt-1 pb-1 mb-4 outline-0 border border-gray-300 rounded-md' id='Count' onChange={e => setPlayerCount(e.target.value)} onKeyDown={() => { }} required />
+              
+                <div className='flex flex-col w-100 bg-indigo-500/60 p-2 rounded-md mb-4'>
+                    <h4 className='font-bold  text-white self-center'>Choose Time</h4>
                     <hr className='mt-0.5 mb-1.5' />
                     <ul className="flex flex-row justify-between">
                         <li>
                             <input type="radio" id="time030" name="hosting" value="time030" className="hidden peer" onClick={e => setPlayTime(30)} />
                             <label htmlFor="time030" className="inline-flex items-center justify-between w-full p-1 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
                                 <div className="block">
-                                    <div className="text-xs font-semibold">0:30</div>
+                                    <div className="text-xs font-semibold text-white">0:30</div>
                                 </div>
                             </label>
                         </li>
@@ -51,7 +51,7 @@ const LandingPage = () => {
                             <input type="radio" id="time100" name="hosting" value="time100" className="hidden peer" onClick={e => setPlayTime(60)} />
                             <label htmlFor="time100" className="inline-flex items-center justify-between w-full p-1 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
                                 <div className="block">
-                                    <div className="text-xs font-semibold">1:00</div>
+                                    <div className="text-xs font-semibold text-white">1:00</div>
                                 </div>
                             </label>
                         </li>
@@ -59,7 +59,7 @@ const LandingPage = () => {
                             <input type="radio" id="time130" name="hosting" value="time130" className="hidden peer" onClick={e => setPlayTime(90)} />
                             <label htmlFor="time130" className="inline-flex items-center justify-between w-full p-1 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
                                 <div className="block">
-                                    <div className="text-xs font-semibold">1:30</div>
+                                    <div className="text-xs font-semibold text-white">1:30</div>
                                 </div>
                             </label>
                         </li>
@@ -67,13 +67,12 @@ const LandingPage = () => {
                             <input type="radio" id="time200" name="hosting" value="time200" className="hidden peer" onClick={e => setPlayTime(120)} />
                             <label htmlFor="time200" className="inline-flex items-center justify-between w-full p-1 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
                                 <div className="block">
-                                    <div className="text-xs font-semibold">2:00</div>
+                                    <div className="text-xs font-semibold text-white">2:00</div>
                                 </div>
                             </label>
                         </li>
                     </ul>
                 </div>
-                <br />
                 <button type='submit' id='enterButton' className='p-2 pt-1 pb-1 outline-0 rounded-md bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 text-white' onClick={onCreateGame}>
                     Create Game
                 </button>

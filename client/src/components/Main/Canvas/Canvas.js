@@ -118,7 +118,7 @@ function Canvas({ data, mode, roomNumber, isLead }) {
                 onMouseMove={draw}
                 width={910}
                 height={564}
-                style={{ backgroundColor: "pink" }} />
+                style={{ backgroundColor: "white" }} />
         </div>
     );
 }

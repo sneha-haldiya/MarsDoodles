@@ -15,9 +15,12 @@ const SubHeader = (props) => {
   });
 
   return (
-    <div className='flex justify-around bg-orange-200 max-w-full p-5'>
+    <div className='flex justify-around items-center bg-[#e2e7fe] max-w-full p-2 pr-7'>
       {props.isLead && <ColourPalette {...props} />}
-      <h1>{timer}</h1>
+      <div className='flex flex-row items-center p-2'>
+        <span>⌛</span>
+        <span>{timer}</span>
+      </div>
     </div>
   )
 }

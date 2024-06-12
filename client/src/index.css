@@ -30,3 +30,41 @@
 ::-webkit-scrollbar-thumb:hover{
     background: #b0b0b0;
 }
+
+.startBtn {
+	display: flex;
+	font-size: 17px;
+	padding: 0.5em 1.3em 0.5em 0.9em;
+	color: white;
+	background: linear-gradient(to right, #484892, #725ac1, #484892);
+	border-radius: 16px;
+}
+
+.startBtn i {
+    margin-top: 5px;
+	margin-right: 9px;
+	transform: rotate(4deg);
+	transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.startBtn:hover i {
+	transform: translateX(4px) rotate(40deg);
+}
+
+#brushSizeSlider {
+	-webkit-appearance: none;
+	height: 10px;
+	border-radius: 8px;
+	border: 0.09rem solid black;
+	background: rgb(240, 211, 255);
+
+}
+
+#brushSizeSlider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	width: 25px;
+	height: 25px;
+	border-radius: 60%;
+	background: #5d6ec7;
+	border: 0.09rem solid black;
+	cursor: pointer;
+}

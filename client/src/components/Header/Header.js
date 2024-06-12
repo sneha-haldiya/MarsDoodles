@@ -21,11 +21,11 @@ const Header = ({ roomNumber, isLead }) => {
   }
 
   return (
-    <div className='flex items-center justify-between rounded-t-md bg-slate-200 w-[-webkit-fill-available] p-2'>
-      <h2 className=''>Mars Doodles</h2>
-      {isLead && visStartButton && <button onClick={startGame}>Start Game</button>}
-      <p>{randomWord}</p>
-      <button onClick={request_disconnect} className='p-1 pl-2 pr-2 bg-red-500'>Leave</button>
+    <div className='flex items-center justify-around rounded-t-md w-[-webkit-fill-available] p-2 bg-[#5d6ec7]'>
+      <h2 className='text-4xl font-bold text-white' style={{textShadow: '0px 0px 5px #b393d3, 0px 0px 10px #b393d3, 0px 0px 10px #b393d3,0px 0px 20px #b393d3'}}><i class="fas fa-mars"></i>Mars Doodles</h2>
+      {isLead && visStartButton && <button onClick={startGame} className='startBtn'><i class="fa fa-rocket" aria-hidden="true"></i>Start Game</button>}
+      <p className='text-2xl font-bold text-white'>{randomWord}</p>
+      <button onClick={request_disconnect} className='p-2 bg-red-500 rounded-lg text-white text-[17px]'>Leave Room</button>
     </div>
   )
 }
