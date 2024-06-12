@@ -22,9 +22,14 @@ const filter = new Filter();
 
 import formatMessage from "./formatMessage.js";
 
+import collection from "./mongo.js";
+
 let word = "";
 let blanks = "";
 let startGame = false;
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 
 
@@ -360,6 +365,54 @@ io.on("connection", (socket) => {
         console.log(data, "has disconnected");
     })
 })
+
+app.get("/", cors(), (req, res) => {
+    res.send("Server is up and running");
+});
+
+app.post("/", async (req, res) => {
+    const { username, password } = req.body;
+    try {
+        const check = await collection.findOne({ username: username}); 
+        if (check) {
+            if (check.password === password) {
+                res.json("exist");
+            } else {
+                res.json("wrongPassword");
+            }
+        }
+        else {
+            res.json("notexist");
+        }
+    } 
+    catch (e) {
+        res.json("fail");
+    }
+});
+
+app.post("/signup", async (req, res) => {
+    const { username, password } = req.body;
+    const data = {
+        username: username,
+        password: password
+    };
+    try {
+        const check = await collection.findOne({ username: username, password:password});
+        if (check) {
+            res.json("exist");
+        } else {
+            res.json("notexist");
+            await collection.insertMany([data]);
+        }
+    }
+    catch (e) {
+        res.json("fail");
+    }
+});
+
+const mongoServer = app.listen(8000, () => {
+    console.log("MongoDB Server connected on port 8000");
+});
 
 server.listen(3001, () => {
     console.log("Server Connected");
