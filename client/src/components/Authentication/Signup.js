@@ -3,18 +3,16 @@ import React, { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 
 
-function Login() {
-    const history=useNavigate();
+const Signup = () => {
+    const relocate = useNavigate();
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
 
-    const [username,setUsername]=useState('')
-    const [password,setPassword]=useState('')
-
-    async function submit(e){
+    async function submit(e) {
         e.preventDefault();
 
-        try{
-
-            const response = await fetch("http://localhost:8000/signup",{
+        try {
+            const response = await fetch("http://localhost:8000/signup", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -22,42 +20,38 @@ function Login() {
                 body: JSON.stringify({ username, password }),
             });
             const res = await response.json();
-            if(res ==="exist"){
-                    alert("User already exists")
-                }
-            else if(res ==="notexist"){
-                    history("/home",{state:{id:username}})
+            if (res === "Signup Success") {
+                relocate("/")
             }
-
+            else {
+                alert(res);
+            }
         }
-        catch(e){
-            alert("Wrong details");
-            console.log(e);
+        catch (e) {
+            alert(`Error: ${e}`);
         }
-
     }
 
 
     return (
-        <div className="login">
+        <div className="flex flex-col bg-black bg-opacity-20 p-4 rounded-md max-w-md mx-auto align-center">
 
-            <h1>Signup</h1>
+            <h1 className="self-center text-2xl text-white">Signup</h1>
 
-            <form action="POST">
-                <input type="text" onChange={(e) => { setUsername(e.target.value) }} placeholder="username"  />
-                <input type="password" onChange={(e) => { setPassword(e.target.value) }} placeholder="Password" />
-                <input type="submit" onClick={submit} />
+            <form action="POST" className="flex flex-col gap-2 m-2 ">
+                <label className='text-left text-base text-white font-semibold'>Username</label>
+                <input type="text" className='p-1 outline-0 border border-gray-300 rounded-md' onChange={(e) => { setUsername(e.target.value) }} placeholder="Username" />
+                <label className='text-left text-base text-white font-semibold'>Password</label>
+                <input type="password" className='p-1 outline-0 border border-gray-300 rounded-md' onChange={(e) => { setPassword(e.target.value) }} placeholder="Password" />
+                <input type="submit" className="p-2 pt-1 pb-1 outline-0 rounded-md bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 text-white" onClick={submit} />
 
             </form>
 
-            <br />
-            <p>OR</p>
-            <br />
-
-            <Link to="/">Login Page</Link>
-
+            <button className="bg-black rounded-md w-fit bg-opacity-10 self-center hover:ring hover:ring-white p-2 flex flex-col">
+                <Link to="/" className="text-sm text-slate-900 ">Login</Link>
+            </button>
         </div>
     )
 }
 
-export default Login
+export default Signup

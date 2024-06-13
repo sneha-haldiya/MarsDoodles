@@ -87,7 +87,7 @@ class Room {
         }
         this.host = this.Players[newIndex];
         this.hostIndex = newIndex;
-        console.log(JSON.stringify(Rooms));
+        // console.log(JSON.stringify(Rooms));
         const l = this.Players;
         io.to(this.roomname).emit("update", (l));
         const message = formatMessage('GameBot', `${this.Players[newIndex].getPlayerName()} is the new host!`, getDate());
@@ -119,7 +119,7 @@ class Room {
         }
         this.lead = this.Players[newIndex];
         this.leadIndex = newIndex;
-        console.log(JSON.stringify(Rooms));
+        // console.log(JSON.stringify(Rooms));
         const l = this.Players;
         io.to(this.roomname).emit("update", (l));
         const message = formatMessage('GameBot', `${this.Players[newIndex].getPlayerName()} is the new lead!`, getDate());
@@ -297,7 +297,7 @@ io.on("connection", (socket) => {
             const intervalId = setInterval(() => {
 
                 if (timer > 0) {
-                    console.log(timer);
+                    // console.log(timer);
                     timer--;
                     const outTime = Math.floor(timer / 60) + ":" + timer % 60;
                     io.to(roomNumber).emit("update_timer", ({ updatedTimer: outTime }));
@@ -373,40 +373,39 @@ app.get("/", cors(), (req, res) => {
 app.post("/", async (req, res) => {
     const { username, password } = req.body;
     try {
-        const check = await collection.findOne({ username: username}); 
+        const check = await collection.findOne({username: username}); 
         if (check) {
-            if (check.password === password) {
-                res.json("exist");
-            } else {
-                res.json("wrongPassword");
+            if(check.password === password)
+            {
+                res.json("Login Success");
+            }
+            else
+            {
+                res.json("Login Failed: Incorrect Password");
             }
         }
         else {
-            res.json("notexist");
+            res.json("Login Failed: Username Not Found");
         }
     } 
     catch (e) {
-        res.json("fail");
+        res.json(`Error: ${ e }`);
     }
 });
 
 app.post("/signup", async (req, res) => {
     const { username, password } = req.body;
-    const data = {
-        username: username,
-        password: password
-    };
     try {
-        const check = await collection.findOne({ username: username, password:password});
+        const check = await collection.findOne({username: username});
         if (check) {
-            res.json("exist");
+            res.json("Signup Failed: Username Already Exist");
         } else {
-            res.json("notexist");
-            await collection.insertMany([data]);
+            await collection.insertMany([{username: username, password: password}]);
+            res.json("Signup Success")
         }
     }
     catch (e) {
-        res.json("fail");
+        res.json(`Error: ${ e }`);
     }
 });
 
