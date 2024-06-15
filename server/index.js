@@ -316,7 +316,7 @@ io.on("connection", (socket) => {
         blanks = "";
         io.to(Rooms[roomIndex].getRoomName()).emit("display_word", (word));
         Rooms[roomIndex].changeLead();
-        io.to(Rooms[roomIndex].getRoomName()).emit("toggle_start_button");
+        /* io.to(Rooms[roomIndex].getRoomName()).emit("toggle_start_button"); */
     }
 
     const verifyLead = (roomname, socketId) => {
