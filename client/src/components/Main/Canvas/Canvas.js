@@ -44,6 +44,7 @@ function Canvas({ data, mode, roomNumber, isLead }) {
                 floodFill.fill(data.color, offsetX, offsetY, 0)
                 // put the modified data back in context
                 ctxRef.current.putImageData(floodFill.imageData, 0, 0)
+                socket.emit("send_data", ({ image: canvasRef.current.toDataURL(), roomNumber: roomNumber }))
             }
             else if (mode === "circle" || mode === "rectangle") {
                 cs = ctxRef.current.getImageData(0, 0, canvasRef.current.width, canvasRef.current.height);
@@ -100,7 +101,7 @@ function Canvas({ data, mode, roomNumber, isLead }) {
             const img = new Image();
             img.src = image;
             img.onload = function () {
-                ctxRef.current.clearRect(0,0,canvasRef.current.width, canvasRef.current.height)
+                ctxRef.current.clearRect(0,0,canvasRef.current.width, canvasRef.current.height);
                 ctxRef.current.drawImage(this, 0, 0, canvasRef.current.width, canvasRef.current.height);
             };
         }

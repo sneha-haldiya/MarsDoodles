@@ -88,8 +88,8 @@ class Room {
         this.host = this.Players[newIndex];
         this.hostIndex = newIndex;
         // console.log(JSON.stringify(Rooms));
-        const l = this.Players;
-        io.to(this.roomname).emit("update", (l));
+        const l = JSON.stringify(this.Players);
+        io.to(this.roomname).emit("update", ({l: l}));
         const message = formatMessage('GameBot', `${this.Players[newIndex].getPlayerName()} is the new host!`, getDate());
         io.to(this.roomname).emit('receive_message', (message));
     }
@@ -111,19 +111,22 @@ class Room {
             if (i === newIndex) {
                 this.Players[i].isLead = true;
                 io.to(this.Players[i].getPlayerSocketId()).emit("update_lead", { lead: true });
+                io.to(this.Players[i].getPlayerSocketId()).emit("toggle_start_button", (true));
             }
             else {
                 this.Players[i].isLead = false;
                 io.to(this.Players[i].getPlayerSocketId()).emit("update_lead", { lead: false });
+                io.to(this.Players[i].getPlayerSocketId()).emit("toggle_start_button", (false));
             }
         }
         this.lead = this.Players[newIndex];
         this.leadIndex = newIndex;
         // console.log(JSON.stringify(Rooms));
-        const l = this.Players;
-        io.to(this.roomname).emit("update", (l));
+        const l = JSON.stringify(this.Players);
+        io.to(this.roomname).emit("update", ({l: l}));
         const message = formatMessage('GameBot', `${this.Players[newIndex].getPlayerName()} is the new lead!`, getDate());
         io.to(this.roomname).emit('receive_message', (message));
+        
     }
     getRoomName() {
         return this.roomname;
@@ -147,6 +150,7 @@ class Player {
         this.isLead = isLead
         this.roomName = roomName
         this.points = 0;
+        this.gainPoints = 0;
         this.warning = 0;
     }
     getPlayerName() {
@@ -157,6 +161,15 @@ class Player {
     }
     getPoints() {
         return this.points;
+    }
+    setPoints(p) {
+        this.points = p;
+    }
+    getGainPoints() {
+        return this.gainPoints;
+    }
+    setGainPoints(p) {
+        this.gainPoints = p;
     }
     getIsHost() {
         return this.isHost;
@@ -212,8 +225,8 @@ io.on("connection", (socket) => {
             Rooms[roomIndex].addPlayer(player);
             socket.join(roomName);
             socket.emit("join_successfull", ({ roomName, playerName, host: false, lead: false }));
-            const l = Rooms[roomIndex].getPlayers();
-            io.to(roomName).emit("update", (l));
+            const l = JSON.stringify(Rooms[roomIndex].getPlayers());
+            io.to(roomName).emit("update", ({l: l}));
             const message = formatMessage('GameBot', `Welcome to Mars Doodles, ${playerName}`, getDate());
             io.to(roomName).emit('receive_message', (message));
             const playTime = Rooms[roomIndex].getTimer();
@@ -235,8 +248,8 @@ io.on("connection", (socket) => {
         Rooms.push(new Room(p, p, roomName, playerCount, playTime));
         socket.join(roomName);
         socket.emit("join_successfull", ({ roomName, playerName, host: true, lead: true }));
-        const l = [p];
-        socket.emit("update", (l));
+        const l = JSON.stringify(Rooms[getRoomIndex(Rooms, roomName)].getPlayers());
+        socket.emit("update", ({l: l}));
         const message = formatMessage('GameBot', `Welcome to Mars Doodles, ${playerName}`, getDate());
         io.to(roomName).emit('receive_message', (message));
         const outTime = Math.floor(playTime / 60) + ":" + playTime % 60;
@@ -247,6 +260,8 @@ io.on("connection", (socket) => {
         const p = Rooms[/* Rooms.map(Room => Room.getRoomName()).indexOf(data.room) */getRoomIndex(Rooms, data.room)].getPlayers();
         p.forEach((player) => {
             if (data.mess === word) {
+                if(player.getPlayerSocketId() === socket.id)
+                player.setGainPoints(100);
                 const message = formatMessage('GameBot', (player.getPlayerName() !== data.author) ? `YAY, ${data.author} guessed the answer!` : `YAY, You guessed the answer!`, getDate());
                 io.to(player.getPlayerSocketId()).emit('receive_message', (message));
             }
@@ -254,42 +269,41 @@ io.on("connection", (socket) => {
                 const cleanedMessage = formatMessage(data.author, filter.clean(data.mess), getDate());
                 io.to(player.getPlayerSocketId()).emit('receive_message', (cleanedMessage));
                 if (cleanedMessage.mess != data.mess) {
-                    //console.log(player.getWarning(),"warning");
                     if (player.getPlayerSocketId() === socket.id) {
                         if (player.getWarning() == 0) {
                             io.to(player.getPlayerSocketId()).emit('receive_message', formatMessage('GameBot', `⚠️Warning ${player.getWarning() + 1}: DO NOT USE SUCH LANGUAGE OTHERWISE YOU WILL BE PENALISED!!`, getDate()));
                             player.setWarning(player.getWarning() + 1);
                         }
                         else if (player.getWarning() == 1) {
+                            player.setGainPoints(player.getGainPoints() - 50);
                             io.to(player.getPlayerSocketId()).emit('receive_message', formatMessage('GameBot', `⚠️Warning ${player.getWarning() + 1}: 50 POINTS DEDUCTED. NEXT TIME YOU WILL BE KICKED OUT!!`, getDate()));
                             player.setWarning(player.getWarning() + 1);
                         }
                         else {
-                            socket.leave();
+                            socket.emit("force_remove");
                         }
                     }
                 }
             }
         })
-        // io.to(data.room).emit('receive_message', (data));
     });
 
     socket.on("start_game", ({ roomNumber }) => {
-        socket.emit("toggle_start_button");
+        socket.emit("toggle_start_button", (false));
         startGame = true;
         word = generate({ minLength: 4, maxLength: 10 });
         blanks = generateBlanks(word);
         let roomIndex = getRoomIndex(Rooms, roomNumber);
-        const room = Rooms/* .find(Room => Room.getRoomName() === roomNumber) */[roomIndex];
+        const room = Rooms[roomIndex];
         if (room) {
             const players = room.getPlayers();
             players.forEach(player => {
                 if (player.getIsLead()) {
-                    //console.log("randomWord~~",randomWord)
+                    
                     socket.emit("display_word", (word));
                 }
                 else {
-                    //console.log("blanks~~",blanks);
+                    
                     socket.broadcast.to(roomNumber).emit("display_word", (blanks));
                 }
             });
@@ -297,7 +311,7 @@ io.on("connection", (socket) => {
             const intervalId = setInterval(() => {
 
                 if (timer > 0) {
-                    // console.log(timer);
+                    
                     timer--;
                     const outTime = Math.floor(timer / 60) + ":" + timer % 60;
                     io.to(roomNumber).emit("update_timer", ({ updatedTimer: outTime }));
@@ -311,16 +325,18 @@ io.on("connection", (socket) => {
     const endGame = (time, roomIndex) => {
         startGame = false;
         const outTime = Math.floor(time / 60) + ":" + time % 60;
+        const l = Rooms[roomIndex].getPlayers();
+        io.to(Rooms[roomIndex].getRoomName()).emit("update_points", (l));
+        Rooms[roomIndex].getPlayers().forEach((p) => {p.setPoints(p.getPoints() + p.getGainPoints()); p.setGainPoints(0)})
         io.to(Rooms[roomIndex].getRoomName()).emit("set_time_init", ({ time: outTime }));
         word = "";
         blanks = "";
         io.to(Rooms[roomIndex].getRoomName()).emit("display_word", (word));
         Rooms[roomIndex].changeLead();
-        /* io.to(Rooms[roomIndex].getRoomName()).emit("toggle_start_button"); */
     }
 
     const verifyLead = (roomname, socketId) => {
-        return Rooms[/* Rooms.map((room) => room.getRoomName()).indexOf(roomname) */getRoomIndex(Rooms, roomname)].getLead().getPlayerSocketId() === socketId;
+        return Rooms[getRoomIndex(Rooms, roomname)].getLead().getPlayerSocketId() === socketId;
     }
 
 
@@ -356,8 +372,8 @@ io.on("connection", (socket) => {
         if(Rooms[index].getLead().getPlayerSocketId() === socketId)
             Rooms[index].changeLead();
         const playerName = Rooms[index].removePlayer(socketId);
-        const l = Rooms[index].getPlayers();
-        io.to(roomNumber).emit("update", (l));
+        const l = JSON.stringify(Rooms[index].getPlayers());
+        io.to(roomNumber).emit("update", ({l: l}));
         const message = formatMessage('GameBot', `${playerName} has left the room.`, getDate());
         io.to(roomNumber).emit('receive_message', (message));
     })
