@@ -95,6 +95,11 @@ function Canvas({ data, mode, roomNumber, isLead }) {
             canDraw = (false);
         }
     }
+
+    const clearCanvas = () =>{
+        ctxRef.current.clearRect(0,0,canvasRef.current.width, canvasRef.current.height);
+    }
+
     socket.on("receive_image", ({ image }) => {
         if (!isLead) {
             console.log("client got data");
@@ -107,6 +112,9 @@ function Canvas({ data, mode, roomNumber, isLead }) {
         }
     })
 
+    socket.on("clear_canvas",()=>{
+        clearCanvas();
+    })
 
 
 
@@ -119,7 +127,7 @@ function Canvas({ data, mode, roomNumber, isLead }) {
                 onMouseMove={draw}
                 width={910}
                 height={564}
-                style={{ backgroundColor: "white" }} />
+                style={{ backgroundColor: "white" }} id='canvas' />
         </div>
     );
 }

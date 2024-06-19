@@ -10,7 +10,7 @@ const Main = ({ roomNumber, userName, data, mode, isHost, isLead }) => {
     <div className='rounded-br-xl' style={{display: 'grid', gridTemplateColumns: '1fr 3fr 1fr' }}>
       <Sidebar roomNumber = {roomNumber} isHost={isHost} isLead={isLead}/>
       <Canvas data={data} mode={mode} roomNumber={roomNumber} isLead={isLead}/>
-      <Chatbar roomNumber={roomNumber} userName={userName} />
+      <Chatbar roomNumber={roomNumber} userName={userName} isLead={isLead}/>
     </div>
   )
 }

@@ -39,16 +39,15 @@ const LandingPage = ({playerName}) => {
                     <hr className='mt-0.5 mb-1.5' />
                     <ul className="flex flex-row justify-between">
                         <li>
-                            <input type="radio" id="time030" name="hosting" value="time030" className="hidden peer" onClick={e => setPlayTime(30)} />
-                            <label htmlFor="time030" className="inline-flex items-center justify-between w-full p-1 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
-                                <div className="block">
+                            <input type="radio" id="time030" name="hosting" value="time030" className="hidden peer" onClick={e => setPlayTime(30)} />           
+                            <label htmlFor="time030" className="inline-flex items-center justify-between w-full p-1 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-white-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 peer-checked:bg-gray-900 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-700 dark:hover:bg-gray-900">    <div className="block">
                                     <div className="text-xs font-semibold text-white">0:30</div>
                                 </div>
                             </label>
                         </li>
                         <li>
                             <input type="radio" id="time100" name="hosting" value="time100" className="hidden peer" onClick={e => setPlayTime(60)} />
-                            <label htmlFor="time100" className="inline-flex items-center justify-between w-full p-1 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
+                            <label htmlFor="time100" className="inline-flex items-center justify-between w-full p-1 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 peer-checked:bg-gray-900 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-700 dark:hover:bg-gray-900">
                                 <div className="block">
                                     <div className="text-xs font-semibold text-white">1:00</div>
                                 </div>
@@ -56,7 +55,7 @@ const LandingPage = ({playerName}) => {
                         </li>
                         <li>
                             <input type="radio" id="time130" name="hosting" value="time130" className="hidden peer" onClick={e => setPlayTime(90)} />
-                            <label htmlFor="time130" className="inline-flex items-center justify-between w-full p-1 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
+                            <label htmlFor="time130" className="inline-flex items-center justify-between w-full p-1 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 peer-checked:bg-gray-900 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-700 dark:hover:bg-gray-900">
                                 <div className="block">
                                     <div className="text-xs font-semibold text-white">1:30</div>
                                 </div>
@@ -64,7 +63,7 @@ const LandingPage = ({playerName}) => {
                         </li>
                         <li>
                             <input type="radio" id="time200" name="hosting" value="time200" className="hidden peer" onClick={e => setPlayTime(120)} />
-                            <label htmlFor="time200" className="inline-flex items-center justify-between w-full p-1 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
+                            <label htmlFor="time200" className="inline-flex items-center justify-between w-full p-1 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 peer-checked:bg-gray-900 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-700 dark:hover:bg-gray-900">
                                 <div className="block">
                                     <div className="text-xs font-semibold text-white">2:00</div>
                                 </div>

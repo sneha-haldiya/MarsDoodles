@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect,useRef } from 'react'
 import JoinPage from './LandingPage/JoinPage'
 import CreateRoomPage from './LandingPage/CreateRoomPage'
 import GamePage from './GamePage'
@@ -14,10 +14,25 @@ const Home = () => {
   const [userName, setUserName] = useState(home.state.username);
   const [isHost, setIsHost] = useState(false);
   const [isLead, setIsLead] = useState(false);
-
+  const [isPlaying, setIsPlaying] = useState(false);
   socket.on("change_username", (value) => {
     setUserName(value);
   })
+
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    audioRef.current = new Audio('/colorful-potions-29571.mp3');
+  }, []);
+
+  const toggleMusic = () => {
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
 
   socket.on("join_successfull", ({ roomName, playerName, host, lead }) => {
     setRoomNumber(roomName);
@@ -55,9 +70,15 @@ const Home = () => {
                 <CreateRoomPage playerName={userName}/>
             </div>
           </div>
+
         )}
         {!loginVisible && <div>
           <GamePage roomNumber={roomNumber} userName={userName} isHost={isHost} isLead={isLead} />
+        </div>}
+        {loginVisible && <div className='ml-8 mb-10'>
+           <button onClick={toggleMusic} className=" text-white">
+                <i className={`fas fa-solid ${isPlaying ? 'fa-volume-up' : 'fa-volume-down'}`}></i>
+            </button>
         </div>}
       </div>
     </SocketContext.Provider>

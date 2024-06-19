@@ -15,6 +15,10 @@ const ColourPalette = (props) => {
   const setMode = (e) => {
     socket.emit("set_mode", ({mode: e, roomNumber: roomNumber}));
   }
+    
+  const clearCanvas = () => {
+    socket.emit("clear_canvas", { roomNumber });
+  }
 
   socket.on("set_color_client", ({penColor}) => {
     props.setData({ ...props.data, color: penColor});
@@ -38,6 +42,7 @@ const ColourPalette = (props) => {
           <button className='bg-red-300 pt-1 p-2 rounded-xl w-[-webkit-fill-available] ' onClick={() => setMode("circle")}>circle</button>
           <button className='bg-blue-300 pt-1 p-2 rounded-xl w-[-webkit-fill-available] ' onClick={() => setMode("rectangle")}>rectangle</button>
           <button className='bg-green-300 pt-1 p-2 rounded-xl w-[-webkit-fill-available] ' onClick={() => setMode("floodfill")}>floodfill</button>
+          <button className='bg-gray-300 pt-1 p-2 rounded-xl w-[-webkit-fill-available]' onClick={clearCanvas}>clear</button>
       </div>
     </div>}
     </>

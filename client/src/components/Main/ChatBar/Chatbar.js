@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { socket } from '../../../context/socket';
 import ChatMessages from './ChatMessages';
 
-const Chatbar = ({ roomNumber, userName }) => {
+const Chatbar = ({ roomNumber, userName, isLead }) => {
   // const socket = useContext(SocketContext);
   const [message, setMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
@@ -37,7 +37,7 @@ const Chatbar = ({ roomNumber, userName }) => {
           })}
         </div>
       </div>
-      <div className='flex p-2 pb-1 bg-purple-200'>
+      {!isLead && (<div className='flex p-2 pb-1 bg-purple-200'>
         <form id='formId' action='' style={{width: "100%"}} className="flex flex-row " onSubmit={(e) => { e.preventDefault() }}>
           <input
             type="text"
@@ -51,7 +51,7 @@ const Chatbar = ({ roomNumber, userName }) => {
             <span className="ml-2 mr-2">Send</span>
           </button>
         </form>
-      </div>
+      </div>)}
     </div>
 
 

@@ -320,8 +320,14 @@ io.on("connection", (socket) => {
                     endGame(room.getTimer(), roomIndex);
                 }
             }, 1000);
+            io.to(roomNumber).emit("clear_canvas");
         }
     });
+
+    socket.on('clear_canvas', ({ roomNumber }) => {
+        io.to(roomNumber).emit('clear_canvas');
+    });
+
     const endGame = (time, roomIndex) => {
         startGame = false;
         const outTime = Math.floor(time / 60) + ":" + time % 60;
