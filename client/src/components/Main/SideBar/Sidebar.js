@@ -7,13 +7,13 @@ const Sidebar = ({ roomNumber, isHost, isLead }) => {
   const socket = useContext(SocketContext);
   const [list, setList] = useState([]);
   const [winnerList, setWinnerList] = useState([]);
-
+  
   socket.on("update", ({ l }) => {
     console.log(l);
     l = JSON.parse(l);
     console.log(l);
     setList(l.map((p, index) =>
-      <li key={index + 1}>{p.playerName} {p.points} {p.isHost ? " (H)" : null}{p.isLead ? " (L)" : null}</li>
+      <li key={index + 1}>{p.playerName} {p.points} {p.isHost ? " (H)" : null}{p.isLead ? " (L)" : null} {!(isHost & p.isHost) && <button className='bg-red-500 p-2 ml-1 rounded' onClick={() => {socket.emit("kick_player", ({ player: p }))}}> kick </button>}</li>
     ))
   });
 

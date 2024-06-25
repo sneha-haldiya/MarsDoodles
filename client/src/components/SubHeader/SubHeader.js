@@ -15,24 +15,13 @@ const SubHeader = (props) => {
   });
  
   const saveImage = () => {
-    const canvas = document.getElementById('canvas'); 
-    if (canvas) {
-      const dataURL = canvas.toDataURL('image/png');
-      const link = document.createElement('a');
-      link.href = dataURL;
-      link.download = 'drawing.png';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else {
-      console.error('Canvas element not found');
-    }
+    socket.emit("save_image");
   }
 
   return (
     <div className='flex justify-around items-center bg-[#e2e7fe] max-w-full p-2 pr-7'>
       <button onClick={saveImage} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded flex items-center">
-      <i class="fas fa-solid fa-download"></i></button>
+      <i className="fas fa-solid fa-download"></i></button>
       {props.isLead && <ColourPalette {...props} />}
       <div className='flex flex-row items-center'>
         <span>⌛</span>

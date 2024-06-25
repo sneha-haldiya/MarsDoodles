@@ -223,7 +223,6 @@ io.on("connection", (socket) => {
         else {
             const player = new Player(playerName, false, false, roomName, socket.id);
             Rooms[roomIndex].addPlayer(player);
-            socket.join(roomName);
             socket.emit("join_successfull", ({ roomName, playerName, host: false, lead: false }));
             const l = JSON.stringify(Rooms[roomIndex].getPlayers());
             io.to(roomName).emit("update", ({l: l}));
@@ -234,6 +233,7 @@ io.on("connection", (socket) => {
             socket.emit("set_time_init", ({ time: outTime }));
             if (!startGame)
                 socket.emit("display_word", (blanks));
+            socket.join(roomName);
         }
 
     })
@@ -246,7 +246,6 @@ io.on("connection", (socket) => {
         roomName = roomName.toString();
         const p = new Player(playerName, true, true, roomName, socket.id);
         Rooms.push(new Room(p, p, roomName, playerCount, playTime));
-        socket.join(roomName);
         socket.emit("join_successfull", ({ roomName, playerName, host: true, lead: true }));
         const l = JSON.stringify(Rooms[getRoomIndex(Rooms, roomName)].getPlayers());
         socket.emit("update", ({l: l}));
@@ -254,6 +253,7 @@ io.on("connection", (socket) => {
         io.to(roomName).emit('receive_message', (message));
         const outTime = Math.floor(playTime / 60) + ":" + playTime % 60;
         socket.emit("set_time_init", ({ time: outTime }));
+        socket.join(roomName);
     })
 
     socket.on("send_message", (data) => {
@@ -363,6 +363,14 @@ io.on("connection", (socket) => {
     socket.on("set_mode", ({ mode, roomNumber }) => {
         if (verifyLead(roomNumber, socket.id))
             io.to(roomNumber).emit("set_mode_client", ({ brushMode: mode }));
+    })
+
+    socket.on("save_image", () => {
+        socket.emit("save_image");
+    })
+
+    socket.on("kick_player", ({ player }) => {
+        io.to(player.socketId).emit("force_remove");
     })
 
     socket.on("request_disconnect", ({ roomNumber }) => {

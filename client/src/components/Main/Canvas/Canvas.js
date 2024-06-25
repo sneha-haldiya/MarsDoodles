@@ -71,7 +71,7 @@ function Canvas({ data, mode, roomNumber, isLead }) {
                 ctxRef.current.putImageData(cs, 0, 0);
                 p2.x = x;
                 p2.y = y;
-                ctxRef.current.beginPath();
+                ctxRef.current.beginPath(); 
                 if (mode === "circle") {
                     let radius = Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
                     ctxRef.current.arc(p1.x, p1.y, radius, 0, 2 * Math.PI);
@@ -95,11 +95,7 @@ function Canvas({ data, mode, roomNumber, isLead }) {
             canDraw = (false);
         }
     }
-
-    const clearCanvas = () =>{
-        ctxRef.current.clearRect(0,0,canvasRef.current.width, canvasRef.current.height);
-    }
-
+    
     socket.on("receive_image", ({ image }) => {
         if (!isLead) {
             console.log("client got data");
@@ -112,10 +108,24 @@ function Canvas({ data, mode, roomNumber, isLead }) {
         }
     })
 
+    socket.on("save_image", () => {
+        const dataURL = canvasRef.current.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = dataURL;
+        link.download = 'drawing.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    })
+    
+    const clearCanvas = () =>{
+        ctxRef.current.clearRect(0,0,canvasRef.current.width, canvasRef.current.height);
+    }
+
     socket.on("clear_canvas",()=>{
         clearCanvas();
     })
-
+    
 
 
     return (
@@ -127,7 +137,7 @@ function Canvas({ data, mode, roomNumber, isLead }) {
                 onMouseMove={draw}
                 width={910}
                 height={564}
-                style={{ backgroundColor: "white" }} id='canvas' />
+                style={{ backgroundColor: "white" }}/>
         </div>
     );
 }
