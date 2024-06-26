@@ -224,16 +224,16 @@ io.on("connection", (socket) => {
             const player = new Player(playerName, false, false, roomName, socket.id);
             Rooms[roomIndex].addPlayer(player);
             socket.emit("join_successfull", ({ roomName, playerName, host: false, lead: false }));
-            const l = JSON.stringify(Rooms[roomIndex].getPlayers());
-            io.to(roomName).emit("update", ({l: l}));
             const message = formatMessage('GameBot', `Welcome to Mars Doodles, ${playerName}`, getDate());
+            socket.join(roomName);
             io.to(roomName).emit('receive_message', (message));
             const playTime = Rooms[roomIndex].getTimer();
             const outTime = Math.floor(playTime / 60) + ":" + playTime % 60;
             socket.emit("set_time_init", ({ time: outTime }));
             if (!startGame)
                 socket.emit("display_word", (blanks));
-            socket.join(roomName);
+            const l = JSON.stringify(Rooms[roomIndex].getPlayers());
+            io.to(roomName).emit("update", ({l}));
         }
 
     })
@@ -247,13 +247,13 @@ io.on("connection", (socket) => {
         const p = new Player(playerName, true, true, roomName, socket.id);
         Rooms.push(new Room(p, p, roomName, playerCount, playTime));
         socket.emit("join_successfull", ({ roomName, playerName, host: true, lead: true }));
-        const l = JSON.stringify(Rooms[getRoomIndex(Rooms, roomName)].getPlayers());
-        socket.emit("update", ({l: l}));
+        socket.join(roomName);
         const message = formatMessage('GameBot', `Welcome to Mars Doodles, ${playerName}`, getDate());
         io.to(roomName).emit('receive_message', (message));
         const outTime = Math.floor(playTime / 60) + ":" + playTime % 60;
         socket.emit("set_time_init", ({ time: outTime }));
-        socket.join(roomName);
+        const l = JSON.stringify(Rooms[getRoomIndex(Rooms, roomName)].getPlayers());
+        socket.emit("update", ({l}));
     })
 
     socket.on("send_message", (data) => {
@@ -290,6 +290,7 @@ io.on("connection", (socket) => {
 
     socket.on("start_game", ({ roomNumber }) => {
         socket.emit("toggle_start_button", (false));
+        socket.emit("disable_chat");
         startGame = true;
         word = generate({ minLength: 4, maxLength: 10 });
         blanks = generateBlanks(word);

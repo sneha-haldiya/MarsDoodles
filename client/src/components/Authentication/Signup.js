@@ -48,7 +48,7 @@ const Signup = () => {
             </form>
 
             <button className="bg-black rounded-md w-fit bg-opacity-10 self-center hover:ring hover:ring-white p-2 flex flex-col">
-                <Link to="/" className="text-sm text-slate-900 ">Login</Link>
+                <Link to="/" className="text-sm text-white ">Login</Link>
             </button>
         </div>
     )

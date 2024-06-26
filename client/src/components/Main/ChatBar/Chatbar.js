@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { socket } from '../../../context/socket';
 import ChatMessages from './ChatMessages';
 
-const Chatbar = ({ roomNumber, userName, isLead }) => {
-  // const socket = useContext(SocketContext);
+const Chatbar = ({ roomNumber, userName }) => {
   const [message, setMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
+  const [disable, setDisable] = useState(false);
 
   const sendMessage = () => {
     if (message !== "") {
@@ -22,6 +22,10 @@ const Chatbar = ({ roomNumber, userName, isLead }) => {
     }
   }
 
+  socket.on("disable_chat", () => {
+    setDisable(!disable);
+  })
+
   useEffect(() => {
     socket.on("receive_message", (data) => {
       setMessageList((list) => [...list, data]);
@@ -37,7 +41,7 @@ const Chatbar = ({ roomNumber, userName, isLead }) => {
           })}
         </div>
       </div>
-      {!isLead && (<div className='flex p-2 pb-1 bg-purple-200'>
+      {!disable && <div className='flex p-2 pb-1 bg-purple-200'>
         <form id='formId' action='' style={{width: "100%"}} className="flex flex-row " onSubmit={(e) => { e.preventDefault() }}>
           <input
             type="text"
@@ -51,7 +55,7 @@ const Chatbar = ({ roomNumber, userName, isLead }) => {
             <span className="ml-2 mr-2">Send</span>
           </button>
         </form>
-      </div>)}
+      </div>}
     </div>
 
 
