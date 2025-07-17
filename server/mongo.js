@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
-
+// URL -> "mongodb://0.0.0.0:27017/test"
 async function connectDB() {
     try {
-        await mongoose.connect("mongodb://0.0.0.0:27017/test", {
+        await mongoose.connect(process.env.MONGO_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
