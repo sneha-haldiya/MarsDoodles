@@ -187,19 +187,14 @@ class Player {
         return this.warning;
     }
 }
-/* OLD
-const io = new Server(server, {
-    cors: {
-        origin: "http://localhost:3000",
-        methods: ["GET", "POST"],
-    }
-}); */
+
 const io = new Server(server, {
     cors: {
         origin: "*",
         methods: ["GET", "POST"],
     }
 });
+
 io.on("connection", (socket) => {
 
     socket.on("join_room", ({ playerName, roomName }) => {
