@@ -1,11 +1,13 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+dotenv.config();
 
 async function connectDB() {
     try {
-        await mongoose.connect(process.env.MONGO_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
+        const uri = process.env.MONGO_URI;
+        if (!uri) throw new Error("MongoDB URI not found in environment variables.");
+        
+        await mongoose.connect(process.env.MONGO_URI);
         console.log("MongoDB connected");
     } catch (error) {
         console.log('Failed to connect to MongoDB', error);

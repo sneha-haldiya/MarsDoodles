@@ -2,7 +2,9 @@
 import React from "react";
 import socketio from "socket.io-client";
 
-export const socket = socketio.connect(import.meta.env.VITE_BACKEND_SOCKET_URL, {
+const socketURL = process.env.REACT_APP_BACKEND_SOCKET_URL;
+
+export const socket = socketio.connect(socketURL, {
   autoConnect: false,
   reconnection: false,
 });
